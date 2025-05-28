@@ -1,81 +1,29 @@
-import LinksSection from "../_components/linksSection";
-import Main from "../_components/main";
-import Section from "../_components/section";
+"use client";
 
-export default function MachineLearning() {
-  const data = [
-    {
-      title: "Linear Regression",
-      link: "/notes/machine-learning/linear-regression",
-    },
-    {
-      title: "Classification",
-      link: "/notes/machine-learning/classification",
-    },
-    {
-      title: "Generative Learning Algorithms",
-      link: "/notes/machine-learning/generative-learning-algorithms",
-    },
-    {
-      title: "Kernel Methods",
-      link: "/notes/machine-learning/kernel-methods",
-    },
-    // {
-    //   title: "Bayesian Learning",
-    //   link: "/notes/machine-learning/bayesian-learning",
-    // },
-    {
-      title: "Learning Theory",
-      link: "/notes/machine-learning/learning-theory",
-    },
-    {
-      title: "Clustering",
-      link: "/notes/machine-learning/clustering",
-    },
-    {
-      title: "Principal Component Analysis",
-      link: "/notes/machine-learning/principal-component-analysis",
-    },
-    {
-      title: "Independent Component Analysis",
-      link: "/notes/machine-learning/independent-component-analysis",
-    },
-    {
-      title: "Expectancy Maximization Algorithm",
-      link: "/notes/machine-learning/em-algorithm",
-    },
-    {
-      title: "Gaussian Mixture Models",
-      link: "/notes/machine-learning/gaussian-mixture-models",
-    },
-    {
-      title: "Factor Analysis",
-      link: "/notes/machine-learning/factor-analysis",
-    },
-    {
-      title: "Variational Autoencoders",
-      link: "/notes/machine-learning/variational-autoencoders",
-    },
-    {
-      title: "Decision Trees",
-      link: "/notes/machine-learning/decision-trees",
-    },
-    {
-      title: "Reinforcement Learning",
-      link: "/notes/machine-learning/reinforcement-learning",
-    },
-  ];
+import { ArrowLeft2 } from "iconsax-react";
+import LinksSection from "../../_components/linksSection";
+import { data } from "./[id]/data";
+import { useRouter } from "next/navigation";
+
+export default function Page() {
+  const router = useRouter();
 
   return (
-    <Main>
-      <Section title="Machine Learning">
-        <LinksSection links={data} />
+    <>
+      <ArrowLeft2 size={20} className="fixed top-4 left-4 text-white opacity-50 hover:opacity-100 cursor-pointer" onClick={() => router.replace("/notes")} />
 
-        <div className="text-sm leading-7 pt-4">
-          <span className="font-semibold">Note: </span>I wrote these notes for my own reference while I was taking the CS229 Machine Learning course at Stanford offered by Anand Avati in Summer 2020.
-          I hope they are useful for others.
+      <div className="flex flex-col h-full w-full justify-center bg-bgLessDark">
+        <div className="flex w-9/12 2xl:w-8/12 flex-col rounded-sm bg-white p-16 mx-auto my-12 gap-3">
+          <div className="text-textBlack text-xl lg:text-2xl font-semibold text-center pb-4">Machine Learning</div>
+
+          <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/machine-learning/${item.id}` }))} />
+
+          <div className="text-sm leading-7 pt-4">
+            <span className="font-semibold">Note: </span>I wrote these notes for my own reference while I was doing the CS229 Machine Learning course offered by Anand Avati at Stanford University in
+            Summer 2020. I hope they are useful for others.
+          </div>
         </div>
-      </Section>
-    </Main>
+      </div>
+    </>
   );
 }

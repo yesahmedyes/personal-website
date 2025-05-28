@@ -1,0 +1,239 @@
+<center>
+# Linear Regression
+</center>
+
+## Logistic Regression
+
+The classification problem is different from the regression problem in that $y$ takes a discrete value (a category label) rather than a continuous value.
+
+Therefore, for logistic regression, we will choose our $h_{\theta}(x)$ to be a sigmoid function that squishes any real number to a value between 0 and 1.
+
+$$
+h_{\theta}(x) = g(\theta^T x) = \frac{1}{1 + e^{-\theta^T x}}
+$$
+
+Let's us assume that:
+
+$$
+p(y=1 ; x, \theta) = h_{\theta}(x)
+$$
+
+$$
+p(y=0 ; x, \theta) = 1 - h_{\theta}(x)
+$$
+
+Now this can be rewritten as:
+
+$$
+p(y \mid x, \theta) = (h_{\theta}(x))^y (1 - h_{\theta}(x))^{1 - y}
+$$
+
+Now, the log-likelihood can be written as:
+
+$$
+\ell(\theta) = \log \, \prod_{i=1}^n \, p(y^{(i)} \mid x^{(i)}, \theta)
+$$
+
+$$
+= \sum_{i=1}^n \, \log \, p(y^{(i)} \mid x^{(i)}, \theta)
+$$
+
+$$
+= \sum_{i=1}^n \, \log \, \left[\left(h_{\theta}(x^{(i)})\right)^{y^{(i)}} \left(1 - h_{\theta}(x^{(i)})\right)^{1 - y^{(i)}} \right]
+$$
+
+Taking it's derivative with respect to $\theta$, we get:
+
+$$
+\frac{\partial}{\partial \theta_j} \, \ell(\theta) = \sum_{i=1}^n \left(y^{(i)} - h_{\theta}(x^{(i)}) \right) x_j^{(i)}
+$$
+
+And so our gradient descent update rule to maximize the log-likelihood becomes:
+
+$$
+\theta_j \leftarrow \theta_j + \alpha \left(y^{(i)} - h_{\theta}(x^{(i)}) \right) x_j^{(i)}
+$$
+
+<Derivation>
+For a sigmoid function, 
+
+$$
+g(z) = \frac{1}{1 + e^{-z}}
+$$
+
+It's derivative is given by:
+
+$$
+\frac{d}{dz} \, g(z) = \frac{d}{dz} \, \frac{1}{1 + e^{-z}}
+$$
+
+$$
+= \frac{d}{dz} \, \left(1 + e^{-z} \right)^{-1}
+$$
+
+$$
+= -1 \left(1 + e^{-z} \right)^{-2} \left(-e^{-z} \right)
+$$
+
+$$
+= \frac{1}{\left(1 + e^{-z} \right)} \frac{e^{-z}}{\left(1 + e^{-z} \right)}
+$$
+
+$$
+= \frac{1}{\left(1 + e^{-z} \right)} \left( 1 - \frac{1}{\left(1 + e^{-z} \right)} \right)
+$$
+
+$$
+= g(z) \left( 1 - g(z) \right)
+$$
+</Derivation>
+
+<Derivation>
+$$
+\frac{\partial}{\partial \theta_j} \, \ell(\theta) = \frac{\partial}{\partial \theta_j} \sum_{i=1}^n \, \log \, \left[\left(h_{\theta}(x^{(i)})\right)^{y^{(i)}} \left(1 - h_{\theta}(x^{(i)})\right)^{1 - y^{(i)}} \right]
+$$
+
+$$
+= \frac{\partial}{\partial \theta_j}\sum_{i=1}^n \left( y^{(i)} \cdot \log h_{\theta}(x^{(i)}) + (1 - y^{(i)}) \cdot \log(1 - h_{\theta}(x^{(i)}) \right)
+$$
+
+$$
+= \frac{\partial}{\partial \theta_j} \sum_{i=1}^n \left(y^{(i)} \cdot \log  g(\theta^T x^{(i)} ) + (1 - y^{(i)}) \cdot \log (1 - g(\theta^T x^{(i)}) ) \right)
+$$
+
+$$
+= \sum_{i=1}^n \left( \left[\frac{y^{(i)}}{g(\theta^T x^{(i)})}  - \frac{1 - y^{(i)}}{1 - g(\theta^T x^{(i)})} \right] \cdot \frac{\partial}{\partial \theta_j} \left[g(\theta^T x^{(i)}) \right] \right)
+$$
+
+<Info>
+$$
+= \sum_{i=1}^n \left( \left[\frac{y^{(i)} - g(\theta^T x^{(i)})}{g(\theta^T x^{(i)}) \cdot \left(1 - g(\theta^T x^{(i)}) \right)} \right] \cdot \frac{\partial}{\partial \theta_j} \left[g(\theta^T x^{(i)}) \right] \right)
+$$
+
+$$
+\frac{a}{b} - \frac{1-a}{1-b} = \frac{a-b}{b(1-b)}
+$$
+</Info>
+
+<Info>
+$$
+= \sum_{i=1}^n \left( \left[\frac{y^{(i)} - g(\theta^T x^{(i)})}{g(\theta^T x^{(i)}) \cdot \left(1 - g(\theta^T x^{(i)}) \right)} \right] \cdot g(\theta^T x^{(i)}) \cdot \left(1 - g(\theta^T x^{(i)}) \right) \cdot \frac{\partial}{\partial \theta_j} \left[\theta^T x^{(i)} \right] \right)
+$$
+
+$$
+g'(z) = g(z) \left( 1 - g(z) \right)
+$$
+</Info>
+
+$$
+= \sum_{i=1}^n \left(y^{(i)} - g(\theta^T x^{(i)}) \right) \cdot x_j^{(i)}
+$$
+
+$$
+= \sum_{i=1}^n \left(y^{(i)} - h_{\theta}(x^{(i)}) \right) \cdot x_j^{(i)}
+$$
+</Derivation>
+
+Also, note that maximizing the log-likelihood is equivalent to minimizing the logistic loss where $t = \theta^T x$
+
+$$
+\arg \min_{\theta} \ell_{logistic}(t, y) = \arg \max_{\theta} \ell(\theta)
+$$
+
+<Derivation>
+$$
+\arg \min_{\theta} \ell_{logistic}(t, y)
+$$
+
+$$
+= \arg \min_{\theta} \left[ y \log \left(1 + e^{-t} \right) + (1 - y) \log \left(1 + e^{t} \right) \right]
+$$
+
+<Info>
+$$
+= \arg \max_{\theta} \left[ y \log \left(\frac{1}{1 + e^{-t}} \right) + (1 - y) \log \left(\frac{1}{1 + e^{t}} \right) \right]
+$$
+
+$$
+- \log a = \log \left(\frac{1}{a} \right)
+$$
+</Info>
+
+$$
+= \arg \max_{\theta} \left[ y \log \left(\frac{1}{1 + e^{-\theta^T x}} \right) + (1 - y) \log \left(\frac{1}{1 + e^{\theta^T x}} \right) \right]
+$$
+
+$$
+= \arg \max_{\theta} \left[ y \log \left(\frac{1}{1 + e^{-\theta^T x}} \right) + (1 - y) \log \left(\frac{1}{1 + e^{\theta^T x}} \right) \right]
+$$
+
+$$
+= \arg \max_{\theta} \left[ y \log \left(\frac{1}{1 + e^{-\theta^T x}} \right) + (1 - y) \log \left(1 - \frac{1}{1 + e^{-\theta^T x}} \right) \right]
+$$
+
+$$
+= \arg \max_{\theta} \ell(\theta)
+$$
+</Derivation>
+
+<Margin />
+
+## Multiclass Classification
+
+For multi-class classification, if we have $k$ classes, we will have $k * \theta$ parameters and will use a one-vs-all approach.
+
+$$
+p(y = i \mid x ; \theta) =  \phi_i = \frac{exp\left(\theta_i^T x\right)}{\sum_{j=1}^{k} exp\left(\theta_j^T x\right)}
+$$
+
+Our cross-entropy loss (which is the negative log-likelihood) can then be written as:
+
+$$
+\ell_{ce}(\theta) = \sum_{i=1}^m \,- \log \left( \frac{exp\left(\theta_{y^{(i)}}^T x^{(i)}\right)}{\sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)} \right)
+$$
+
+Taking the derivative of the cross-entropy loss with respect to $\theta_j$, we get:
+
+$$
+\frac{\partial}{\partial \theta_j} \ell_{ce}(\theta) = \sum_{i=1}^m \left( \phi_j^{(i)} - 1\left\{y^{(i)} = j\right\} \right) x^{(i)}
+$$
+
+Note that $\phi_j^{(i)} = p(y^{(i)} = j \mid x^{(i)}; \theta)$.
+
+Therefore, since $\phi_j^{(i)}$ is a probability between 0 and 1, if $y^{(i)} = j$, we add a negative value of $x^{(i)}$ to our gradient. And if $y^{(i)} \neq j$, we add a positive value of $x^{(i)}$ to our gradient.
+
+Our gradient descent update rule is then:
+
+$$
+\theta_j \leftarrow \theta_j - \alpha \sum_{i=1}^m \left( \phi_j^{(i)} - 1\left\{y^{(i)} = j\right\} \right) x^{(i)}
+$$
+
+<Derivation>
+$$
+\frac{\partial}{\partial \theta_l} \ell_{ce}(\theta) = \frac{\partial}{\partial \theta_l} \, \sum_{i=1}^m \,- \log \left( \frac{exp\left(\theta_{y^{(i)}}^T x^{(i)}\right)}{\sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)} \right)
+$$
+
+$$
+= \frac{\partial}{\partial \theta_l} \, \sum_{i=1}^m \, \left[ - \theta_{y^{(i)}}^T x^{(i)} + \log \sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right) \right]
+$$
+
+$$
+= \sum_{i=1}^m \, \left[\frac{\partial}{\partial \theta_l} \left(\log \sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)\right) - \frac{\partial}{\partial \theta_l} \left(\theta_{y^{(i)}}^T x^{(i)}\right) \right]
+$$
+
+$$
+= \sum_{i=1}^m \, \left[\frac{1}{\sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)} \cdot \left(\frac{\partial}{\partial \theta_l} \sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right) \right) - x^{(i)} \left\{ y^{(i)} = l \right\} \right]
+$$
+
+$$
+= \sum_{i=1}^m \, \left[\frac{exp\left(\theta_l^T x^{(i)}\right)}{\sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)} \cdot x^{(i)} - x^{(i)} \left\{ y^{(i)} = l \right\} \right]
+$$
+
+$$
+= \sum_{i=1}^m \, \left(\frac{exp\left(\theta_l^T x^{(i)}\right)}{\sum_{j=1}^k exp\left(\theta_j^T x^{(i)}\right)} - 1 \left\{ y^{(i)} = l \right\} \right) x^{(i)}
+$$
+
+$$
+= \sum_{i=1}^m \left( \phi_l^{(i)} - 1\left\{y^{(i)} = l\right\} \right) x^{(i)}
+$$
+</Derivation>

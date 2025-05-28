@@ -1,0 +1,219 @@
+<center>
+# Linear Regression
+</center>
+
+## Least Mean Squares
+
+We define a function $h_{\theta}(x)$ to model the $d$ features in each $x^{(i)}$ as:
+
+$$
+h_{\theta}(x) = \sum_{j=1}^{d} \theta_j x_j^{(i)} = \theta^T x
+$$
+
+For $n$ training examples, we also define a cost function that we want to minimize:
+
+$$
+J(\theta) = \frac{1}{2} \sum_{i=1}^{n} \left(h_{\theta}(x^{(i)}) - y^{(i)} \right)^2
+$$
+
+Taking the derivative with respect to any $\theta_j$ we get:
+
+$$
+\frac{\partial}{\partial \theta_j} J(\theta) = \sum_{i=1}^{n} \left[ h_\theta(x^{(i)}) - y^{(i)} \right] x_j^{(i)}
+$$
+
+<Derivation>
+
+$$
+\frac{\partial}{\partial \theta_j} J(\theta) = \frac{\partial}{\partial \theta_j} \left[ \frac{1}{2} \sum_{i=1}^{n} \left(h_{\theta}(x^{(i)}) - y^{(i)} \right)^2 \right]
+$$
+
+$$
+= \sum_{i=1}^{n} \left[2 \cdot \frac{1}{2} \left( h_\theta(x^{(i)}) - y^{(i)} \right) \cdot \frac{\partial}{\partial \theta_j} \left( h_\theta(x^{(i)}) - y^{(i)} \right) \right]
+$$
+
+$$
+= \sum_{i=1}^{n} \left[\left( h_\theta(x^{(i)}) - y^{(i)} \right) \cdot \frac{\partial}{\partial \theta_j} \left(\sum_{k=1}^{d} \left(\theta_k x_k^{(i)} - y^{(i)} \right) \right) \right]
+$$
+
+<Info>
+$$
+= \sum_{i=1}^{n} \left[\left( h_\theta(x^{(i)}) - y^{(i)} \right) \cdot \frac{\partial}{\partial \theta_j} \left( \theta_j x_j^{(i)} \right) \right]
+$$
+
+Ignoring terms that don't depend on $\theta$.
+</Info>
+
+$$
+= \sum_{i=1}^{n} \left[\left( h_\theta(x^{(i)}) - y^{(i)} \right) \cdot x_j^{(i)} \right]
+$$
+
+</Derivation>
+
+With this derivative, we can now use gradient descent to take small steps towards the optimal $\theta$ with the following update rule:
+
+$$
+\theta_j \leftarrow \theta_j + \alpha \left( y^{(i)} - h_\theta (x^{(i)}) \right) x_j^{(i)}
+$$
+
+```python
+def gradient_descent(X, y, alpha, epochs):
+    theta = np.zeros(X.shape[1])
+
+    for epoch in range(epochs):
+        for i in range(len(y)):
+            h = np.dot(theta, X[i])
+            error = y[i] - h
+            theta = theta + alpha * error * X[i]
+
+```
+
+<Margin />
+
+## Closed Form Solution
+
+
+Let $X$ be a matrix that contains each $\left(x^{(i)} \right)^T$ in its rows and has a size of $n$ by $d+1$ where $d$ is the number of features in $x^{(i)}$ and $+ 1$ is for the intercept term.
+
+Also, $\vec{y}$ is an $n$ dimensional vector that contains the labels for each training example. And $\theta$ is a $d$ dimensional vector that contains the weights for each feature.
+
+Now, since $h_{\theta}(x) = \left(x^{(i)} \right)^T\theta$, we can rewrite this in matrix-vector form as $h_{\theta}(x) = X \theta$
+
+With these, we can now rewrite $J(\theta)$ using the fact that $z^T z = \sum_i z_i^2$
+
+$$
+J(\theta) = \frac{1}{2} \sum_{i=1}^{n} \left(h_{\theta}(x^{(i)}) - y^{(i)} \right)^2
+$$
+
+$$
+= \frac{1}{2} \left(X\theta - \vec{y} \right)^T \left(X\theta - \vec{y} \right)
+$$
+
+Finally, to minimize $J(\theta)$, we find its derivative with respect $\theta$, set it equal to $0$ and simplify to see that $\theta$ is minimized when,
+
+$$
+\theta = \left(X^TX\right)^{-1}X^T \vec{y}
+$$
+
+<Derivation>
+$$
+\nabla_{\theta} J(\theta) = \nabla_{\theta} \left(\frac{1}{2} \left(X\theta - \vec{y} \right)^T \left(X\theta - \vec{y} \right) \right)
+$$
+
+$$
+= \frac{1}{2} \nabla_{\theta} \left( (X\theta)^T X\theta - (X \theta)^T \vec{y} - \vec{y}^T (X\theta) + \vec{y}^T \vec{y} \right)
+$$
+
+<Info>
+$$
+= \frac{1}{2} \nabla_{\theta} \left( \theta^T X^T X\theta - \theta^T X^T \vec{y} - \vec{y}^T X\theta \right)
+$$
+
+Ignoring terms that don't depend on $\theta$.
+</Info>
+
+$$
+= \frac{1}{2} \left[ 2 X^T X\theta - \nabla_{\theta} \left( \theta^T X^T \vec{y} + \vec{y}^T X\theta \right) \right]
+$$
+
+$$
+= \frac{1}{2} \left[ 2 X^T X\theta -  X^T \vec{y} - X^T \vec{y} \right]
+$$
+
+$$
+= \frac{1}{2} \left[ 2 X^T X\theta - 2 X^T \vec{y} \right]
+$$
+
+$$
+= X^T X\theta -  X^T \vec{y}
+$$
+
+</Derivation>
+
+We assume that $y^{(i)}$ with $\epsilon^{(i)}$ as the noise in the $i$th example such that $\epsilon^{(i)} \sim \mathcal{N}(0, \sigma^2)$
+
+$$
+y^{(i)} = \theta^T x^{(i)} + \epsilon^{(i)}
+$$
+
+This can be rewritten as $\epsilon^{(i)} = \theta^T x^{(i)} - y^{(i)}$. Now, since $\epsilon^{(i)} \sim \mathcal{N}(0, \sigma^2)$, hence $\left(y^{(i)} - \theta^T x^{(i)} \right) \sim \mathcal{N}(0, \sigma^2)$.
+
+Finally, if we are given $x^{(i)}$, then $y^{(i)} \mid x^{(i)}$ will also follow $\mathcal{N} (0, \sigma^2)$ shifted by $\theta^T x^{(i)}$.
+
+$$
+P \left(y^{(i)} \mid x^{(i)}; \theta \right) \sim \mathcal{N} \left(\theta^T x^{(i)}, \sigma^2 \right)
+$$
+
+To find the maximum likelihood estimate of $\theta$, we need to maximize:
+
+$$
+L(\theta) = L(\theta; X, Y) = \prod_{i=1}^{n} p(y^{(i)} \mid x^{(i)}; \theta)
+$$
+
+Since $log$ is a monotonically increasing function, we can maximize the following instead:
+
+$$
+\ell(\theta) = \log \prod_{i=1}^{n} p(y^{(i)} \mid x^{(i)}; \theta)
+$$
+
+Solving this we see that maximizing $\ell(\theta)$ is equivalent to minimizing:
+
+$$
+-\frac{1}{2} \sum_{i=1}^{n} \left(y^{(i)} - \theta^T x^{(i)} \right)^2
+$$
+
+Notice, that the function that we need to minimized does not depend on $\sigma$ which means that we don't need to know that variance of our noise to be able to maximize our likelihood.
+
+
+<Derivation>
+$$
+\ell(\theta) = \log \prod_{i=1}^{n} p(y^{(i)} \mid x^{(i)}; \theta)
+$$
+          
+$$
+= \sum_{i=1}^{n} \log p(y^{(i)} \mid x^{(i)}; \theta)
+$$
+
+$$
+= \sum_{i=1}^{n} \log \left[\frac{1}{\sigma\sqrt{2\pi}} \exp \left( -\frac{(y^{(i)} - \theta^T x^{(i)})^2}{2\sigma^2} \right) \right]
+$$
+
+$$
+= \sum_{i=1}^{n} \left( \log \left[\frac{1}{\sigma\sqrt{2\pi}} \right] -\frac{(y^{(i)} - \theta^T x^{(i)})^2}{2\sigma^2} \right)
+$$
+
+$$
+= n \left( \log \left[\frac{1}{\sigma\sqrt{2\pi}} \right] \right) -\frac{1}{2\sigma^2}  \left( \sum_{i=1}^{n} (y^{(i)} - \theta^T x^{(i)})^2 \right)
+$$
+
+To find the $\theta$ that maximizes $\ell(\theta)$, we need to find:
+
+$$
+\theta = \arg \max_{\theta} \ell(\theta)
+$$
+
+$$
+= \arg \max_{\theta} \left[ n \left( \log \left[\frac{1}{\sigma\sqrt{2\pi}} \right] \right) -\frac{1}{2\sigma^2}  \left( \sum_{i=1}^{n} (y^{(i)} - \theta^T x^{(i)})^2 \right) \right]
+$$
+
+<Info>
+$$
+= \arg \max_{\theta} \left[ -\frac{1}{2\sigma^2}  \left( \sum_{i=1}^{n} (y^{(i)} - \theta^T x^{(i)})^2 \right) \right]
+$$
+
+Since the first term does not depend on $\theta$
+</Info>
+
+$$
+= \arg \min_{\theta} \left[ \frac{1}{2\sigma^2}  \left( \sum_{i=1}^{n} (y^{(i)} - \theta^T x^{(i)})^2 \right) \right]
+$$
+
+<Info>
+$$
+= \arg \min_{\theta} \left[ \frac{1}{2}  \left( \sum_{i=1}^{n} (y^{(i)} - \theta^T x^{(i)})^2 \right) \right]
+$$
+
+Excluding $\sigma^2$ does not change the result
+</Info>
+
+</Derivation>

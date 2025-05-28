@@ -1,0 +1,214 @@
+<center>
+# Reinforcement Learning
+</center>
+
+## Introduction
+
+Reinforcement learning is a type of machine learning that is used to make decisions based on a set of features. It is a type of supervised learning model that is used to classify data into different categories.
+
+A Markov Decision Process (MDP) is a mathematical framework used to model decision-making in situations where outcomes are uncertain. It is formulated using a tuple $(S, A, P_{sa}, \gamma, R)$, where:
+
+- $S$ is the set of states.
+- $A$ is the set of actions.
+- $P_{sa}$ are the state transition probabilities.
+- $\gamma$ is the discount factor.
+- $R$ is the reward function.
+
+Rewards are usually written as functions of states and actions, i.e. $R(s, a)$ or simply just states, i.e. $R(s)$.
+
+Our goal is to find actions that maximize the expected sum of discounted rewards.
+
+$$
+\mathbb{E}\left[R(s_0) + \gamma R(s_1) + \gamma^2 R(s_2) + ...\right]
+$$
+
+A policy is any function $π : S → A$ that maps from states to actions. A value function $V^{\pi}$ is defined as the expected return starting from state $s$ and following policy $π$.
+
+$$
+V^{\pi}(s) = \mathbb{E}\left[R(s_0) + \gamma R(s_1) + \gamma^2 R(s_2) + ...\right | s_0 = s, π]
+$$
+
+We can write the value function recursively as the Bellman equation:
+
+$$
+V^{\pi}(s) = R(s) + \gamma \sum_{s' \in S} P_{sπ(s)}(s') \cdot \mathbb{E}\left[R(s_1) + \gamma R(s_2) + ...\right | s_1 = s', π]
+$$
+
+$$
+= R(s) + \gamma \sum_{s' \in S}P_{sπ(s)}(s') \cdot V^{\pi}(s')
+$$
+
+Note that $P_{sπ(s)}(s')$ is the probability of landing on state $s'$ from state $s$ if we take the action $π(s)$.
+
+The optimal value function $V^*(s)$ is the maximum value function over all policies:
+
+$$
+V^*(s) = \max_{π} V^{\pi}(s)
+$$
+
+The Bellman equation for the optimal value function is:
+
+$$
+V^*(s) = R(s) + \max_{a \in A} \left(\gamma \sum_{s' \in S} P_{sa}(s') V^*(s') \right)
+$$
+
+The optimal policy $π^*$ is the one that maximizes the value function:
+
+$$
+π^*(s) = \arg\max_{a \in A} \left(\sum_{s' \in S} P_{sa}(s') V^*(s') \right)
+$$
+
+Finding the optimal policy is equivalent to finding the optimal value function. And there are two algorithms that can do this: **Value Iteration** and **Policy Iteration**.
+
+```python
+# Initialize value function
+V = {s: 0 for s in states}
+
+# Iterate until convergence
+while not converged:
+    for s in states:
+        V[s] = R[s] + gamma * max([
+            sum(P[s][a][s_prime] * V[s_prime] for s_prime in states)
+            for a in actions
+        ])
+```
+
+```python
+# Initialize random policy
+pi = {s: random.choice(actions) for s in states}
+
+while not converged:
+    # Policy evaluation: solve V = V^π
+    V = solve_linear_system(pi)  # V^π
+    
+    # Policy improvement
+    for s in states:
+        pi[s] = argmax([
+            sum(P[s][a][s_prime] * V[s_prime] for s_prime in states)
+            for a in actions
+        ])
+```
+
+For small MDPs, Policy iteration converges faster. However, for large MDPs, solving for $V^{\pi}$ in each step of policy iteration involves solving a large system of linear equations, which is computationally expensive.
+
+Usually, we do not know the state transition probabilities $P_{sa}$ before hand. Instead, they can be estimated by repeatedly running the agent on the MDP under policy $π$ and using the following formula:
+
+$$
+P_{sa}(s') = \frac{\text{\# of times we took action } a \text{ in state } s \text{ and ended up in state } s'}{\text{\# of times we took action } a \text{ in state } s}
+$$
+
+<Margin />
+
+## Value Function Approximation
+
+One way to deal with continuous state spaces in MDPs is to descretize the state space. If we have $d$ dimensions and we discretize each dimension with $k$ values, then we have $k^d$ states. As we increase $k$, the number of states grows exponentially.
+
+To deal with this, we can use function approximation.
+
+One way to do this is using a model-based approach. We use a simulator to execute $n$ trials, each for $T$ time steps.
+
+$$
+s_0^{(1)} \xrightarrow{a_0^{(1)}} s_1^{(1)} \xrightarrow{a_1^{(1)}} s_2^{(1)} \xrightarrow{a_2^{(1)}} \cdots \xrightarrow{a_{T-1}^{(1)}} s_T^{(1)}
+$$
+
+$$
+s_0^{(2)} \xrightarrow{a_0^{(2)}} s_1^{(2)} \xrightarrow{a_1^{(2)}} s_2^{(2)} \xrightarrow{a_2^{(2)}} \cdots \xrightarrow{a_{T-1}^{(2)}} s_T^{(2)}
+$$
+
+$$
+\vdots
+$$
+
+$$
+s_0^{(n)} \xrightarrow{a_0^{(n)}} s_1^{(n)} \xrightarrow{a_1^{(n)}} s_2^{(n)} \xrightarrow{a_2^{(n)}} \cdots \xrightarrow{a_{T-1}^{(n)}} s_T^{(n)}
+$$
+
+We can then use these to learn a linear model to predict $s_{t+1}$ as a function of $s_t$ and $a_t$:
+
+$$
+s_{t+1} = A s_t + B a_t
+$$
+
+We can then minimize the squared error over all trials using gradient descent to find $A$ and $B$:
+
+$$
+\arg \min_{A, B} \, \sum_{i=1}^n \sum_{t=0}^{T-1} \left(s_{t+1}^{(i)} - \left(A s_t^{(i)} + B a_t^{(i)}\right) \right)^2
+$$
+
+However, this is a deterministic model. Most real world systems are stochastic. So we can modify the model to be stochastic by adding a noise term:
+
+$$
+s_{t+1} = A s_t + B a_t + \epsilon
+$$
+
+$$
+\epsilon \sim \mathcal{N}(0, \Sigma)
+$$
+
+Now, if we assume that the our state space is continous but our action space is small and discrete, we can use the Fitted value iteration algorithm.
+
+$$
+s_{t+1} - (A s_t + B a_t) = \epsilon
+$$
+
+Since $\epsilon$ is normally distributed, the term $s_{t+1} - (A s_t + B a_t)$ is also normally distributed. We can then write:
+
+$$
+s_{t+1} \sim \mathcal{N}\left(A s_t + B a_t, \Sigma\right)
+$$
+
+Our state transition function can now be written as:
+
+$$
+P_{sa}(s') = \mathcal{N}\left(A s + B a, \, \Sigma\right)
+$$
+
+Moreover, our value iteration update rule for the continuous case can be written as:
+
+$$
+V(s) \leftarrow R(s) + \gamma \cdot \max_{a \in A} \left(\int_{s'} P_{sa}(s') V(s') \, ds' \right)
+$$
+
+However, since out states $s$ are continuous, we have to approximate the value function $V(s)$ as well. We do so by finding a linear or non-linear mapping from states to the value function:
+
+$$
+V(s) = \theta^T \phi(s)
+$$
+
+We also can not directly update our $V(s)$ from the value iteration update rule. Instead, we have to update our $\theta$ parameters.
+
+We do this by minimizing the squared error:
+
+$$
+\arg \min_{\theta} \sum_{i=1}^n \left(y^{(i)} - \theta^T \phi(s^{(i)})\right)^2
+$$
+
+$$
+y^{(i)} = R(s^{(i)}) + \gamma \cdot \max_{a \in A} \left(\int_{s'} P_{sa}(s') V(s') \, ds' \right)
+$$
+
+```python
+def V(s, theta):
+    return theta.T @ phi(s)
+
+# Sample states and initialize parameters
+sampled_states = random.sample(state_space, n)
+theta = np.zeros(feature_dim)
+
+while not converged:
+    y = []
+
+    for s in sampled_states:
+        q_values = []
+
+        for a in actions:
+            # Sample next states from transition model
+            next_states = [sample_from_P(s, a) for _ in range(k)]
+            q_a = R[s] + gamma * mean([V(s_prime, theta) for s_prime in next_states])
+            q_values.append(q_a)
+
+        y.append(max(q_values))
+    
+    # Update parameters via least squares
+    theta = argmin_theta(sum((y[i] - theta.T @ phi(sampled_states[i]))**2 for i in range(n)))
+```

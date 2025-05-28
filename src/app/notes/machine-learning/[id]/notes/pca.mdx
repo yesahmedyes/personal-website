@@ -1,0 +1,159 @@
+<center>
+# Principal Component Analysis
+</center>
+
+Before we apply PCA, we often normalize our data so that each feature has mean 0 and variance 1. We do this by computing the mean and standard deviation of each feature and then for each $x$ in our data, we subtract the mean and divide by the standard deviation.
+
+$$
+\mu_j = \frac{1}{m} \sum_{i=1}^{m} x^{(i)}_j
+$$
+
+$$
+\sigma_j^2 = \frac{1}{m} \sum_{i=1}^{m} (x^{(i)}_j - \mu_j)^2
+$$
+
+$$
+x^{(i)}_j \leftarrow \frac{x^{(i)}_j - \mu_j}{\sigma_j}
+$$
+
+To select the principal component of $x$, we need to find the unit vector $u$ that maximizes the variance of the data when projected onto $u$. The greater the projection of $x$ onto $u$, the higher the variance, meaning more information is captured in that direction.
+
+$$
+u = \arg \max_u \frac{1}{n} \sum_{i=1}^{n} \left\| proj_u ( x^{(i)}) \right\|_2^2
+$$
+
+$$
+= \arg \max_u \left[ u^T \, \Sigma \, u \right] \text{ where } \Sigma = \frac{1}{n} \sum_{i=1}^{n} x^{(i)}x^{(i) T}
+$$
+
+<Derivation>
+<Lemma>
+$$
+proj_u (x) = \frac{x^T u}{u^T u} u
+$$
+
+<Info>
+$$
+= \left( x^T u \right) u
+$$
+
+Since $u$ is a unit vector, so $u^T u = 1$.
+</Info>
+</Lemma>
+
+$$
+u = \arg \max_u \frac{1}{n} \sum_{i=1}^{n} \left\| proj_u ( x^{(i)}) \right\|_2^2
+$$
+
+$$
+= \arg \max_u \frac{1}{n} \sum_{i=1}^{n} \left\| \left( x^{(i) T} \cdot u \right) u \right\|_2^2
+$$
+
+$$
+= \arg \max_u \frac{1}{n} \sum_{i=1}^{n} \left( \left( u^T x^{(i)} x^{(i) T} u \right) \cdot u^T u \right)
+$$
+
+<Info>
+$$
+= \arg \max_u \left[ u^T \left( \frac{1}{n} \sum_{i=1}^{n} x^{(i)} x^{(i) T} \right) u \right]
+$$
+
+Since $u$ is a unit vector, so $u^T u = 1$.
+</Info>
+
+$$
+= \arg \max_u \left[ u^T \, \Sigma \, u \right] \text{ where } \Sigma = \frac{1}{n} \sum_{i=1}^{n} x^{(i)}x^{(i) T}
+$$
+</Derivation>
+
+We can now use Lagrange optimization to find the unit vector $u$ that maximizes the variance. And it turns out the variance is maximized when $u$ is the eigenvector of our symmetric matrix $\Sigma$.
+
+$$
+\Sigma u = \lambda u
+$$
+
+<Derivation>
+<Lemma>
+For any vector $u$, the derivative of the norm of $u$ with respect to $u$ is:
+
+$$
+\frac{d}{du} \|u\| = \frac{u}{\|u\|}
+$$
+</Lemma>
+
+Since $\|u\| = 1$ we can rewrite this as $\|u\| - 1 = 0$ and use this to create our Lagrangian.
+
+$$
+L(u, \beta) = u^T \Sigma u + \beta \left(\|u\| - 1 \right)
+$$
+
+Taking the derivative with respect to $u$:
+
+$$
+\nabla_u L(u, \beta) = 2 \Sigma u + \beta \left( \frac{u}{\|u\|} \right)
+$$
+
+Setting the derivative to 0, we get:
+
+$$
+2 \Sigma u = -\beta \left( \frac{u}{\|u\|} \right)
+$$
+
+<Info>
+$$
+\Rightarrow \Sigma u = \left( -\frac{\beta}{2} \right) u
+$$
+
+Since $u$ is a unit vector, so $\|u\| = 1$.
+</Info>
+
+<Info>
+$$
+\Rightarrow \Sigma u = \lambda u \text{ where } \lambda = -\frac{\beta}{2}
+$$
+
+$\lambda$ is just a scalar value.
+</Info>
+</Derivation>
+
+However, we don't know which $\lambda$ to choose if there are multiple that satisfy this equation.
+
+But we can show we get the maximum variance when we choose the largest eigenvalue $\lambda$.
+
+$$
+\max \sigma^2 \leftrightarrow \max \lambda
+$$
+
+<Derivation>
+$$
+\max \sigma^2 \leftrightarrow \max \left[ u^T \left( \frac{1}{n} \sum_{i=1}^{n} x^{(i)} x^{(i) T} \right) u \right]
+$$
+
+$$
+= \max \left[ u^T \Sigma u \right]
+$$
+
+<Info>
+$$
+= \max \left[ u^T \lambda u \right]
+$$
+
+Since $\Sigma u = \lambda u$
+</Info>
+
+<Info>
+$$
+= \max \left[ \lambda \left(u^T u \right) \right]
+$$
+
+Since $u$ is a unit vector, so $u^T u = 1$.
+</Info>
+
+$$
+= \max \lambda
+$$
+</Derivation>
+
+Therefore, to maximize the variance, we need to choose the eigenvector with the largest eigenvalue.
+
+In practice, we decompose $\Sigma$ into its eigenvalues and eigenvectors using singular value decomposition and then choose the top $k$ eigenvectors with the largest eigenvalues.

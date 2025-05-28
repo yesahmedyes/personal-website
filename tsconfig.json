@@ -29,15 +29,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": [
-    ".eslintrc.cjs",
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.cjs",
-    "**/*.js",
-    ".next/types/**/*.ts",
-    "src/types/**/*.d.ts"
-, "src/app/notes/machine-learning/factor-analysis"  ],
+  "include": [".eslintrc.cjs", "next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.js", ".next/types/**/*.ts", "src/types/**/*.d.ts", "src/app/notes/machine-learning-old/factor-analysis"],
   "exclude": ["node_modules"]
 }

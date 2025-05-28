@@ -1,0 +1,327 @@
+<center>
+# Expectancy Maximization Algorithm
+</center>
+
+## General Formulation
+
+Suppose we have a latent variable model $p(x, z; \theta)$ with $z$ being the latent variable. The density of $x$ can be obtained using marginal probability over $z$:
+
+$$
+p(x; \theta) = \sum_z p(x, z; \theta)
+$$
+
+Now to maximize likelihood, we need to maximize the following function:
+
+$$
+\ell(\theta) = \sum_{i=1}^n \log p(x^{(i)}; \theta)
+$$
+
+$$
+= \sum_{i=1}^n \log \sum_{z^{(i)}} p(x^{(i)}; z^{(i)}; \theta)
+$$
+
+However, the above equation is not concave with respect to $\theta$. Hence, we can not use gradient ascent to find the maximum likelihood estimate.
+
+Moreover, if $p(x; z; \theta)$ is an exponential family distribution, then taking the derivative of the above equation with respect to $\theta$ doesn't typically lead to a solvable expression.
+
+To get around this, we imagine $Q(z)$ to be some distribution over $z$ so that $\sum_z Q(z) = 1$ and $Q(z) \geq 0$
+
+<Detour about="Jensen's Inequality">
+Jensen's inequality states that for a convex function $[f''(x) \geq 0]$ the following inequality holds:
+
+$$
+\mathbb{E}[f(X)] \geq f(\mathbb{E}[X]).
+$$
+
+And for concave functions:
+
+$$
+\mathbb{E}[f(X)] \leq f(\mathbb{E}[X]).
+$$
+
+Also, if $X$ is a constant then $X = \mathbb{E}[X]$ and:
+
+$$
+\mathbb{E}[f(X)] = f(\mathbb{E}[X]).
+$$
+</Detour>
+
+Using Jensen's inequality, we can see that the following inequality holds:
+
+$$
+\log p(x; \theta) = \log \sum_z Q(z) \frac{p(x, z; \theta)}{Q(z)}
+$$
+
+$$
+\geq \sum_z \left[Q(z) \log\frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+
+<Derivation>
+$$
+\log p(x; \theta) = \log \sum_z p(x, z; \theta)
+$$
+
+$$
+= \log \sum_z Q(z) \frac{p(x, z; \theta)}{Q(z)}
+$$
+
+<Info>
+$$
+= \log \mathbb{E}_{z \sim Q}\left[\frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+
+Since $\mathbb{E}_{z \sim p}[g(z)] = \sum_z p(z)g(z)$
+</Info>
+
+<Info>
+$$
+\geq \mathbb{E}_{z \sim Q}\left[\log \frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+
+Using Jensen's inequality
+</Info>
+
+$$
+= \sum_z \left[Q(z) \log \frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+</Derivation>
+
+From Jensen's inequality, we also know that our inequality becomes an equality (the bound becomes right) when the expectation is over a constant:
+
+$$
+\frac{p(x, z; \theta)}{Q(z)} = c
+$$
+
+It turns out that this bound is tight when:
+
+$$
+Q(z) = p(z | x; \theta)
+$$
+
+<Derivation className="mt-3 mb-0">
+$$
+\frac{p(x, z; \theta)}{Q(z)} = c
+$$
+
+$$
+Q(z) = \frac{p(x, z; \theta)}{c}
+$$
+
+Since $\sum_z Q(z) = 1$, therefore the right hand side must also sum to 1:
+
+$$
+\sum_z \left(\frac{p(x, z; \theta)}{c}\right) = 1
+$$
+
+Thus,
+
+$$
+c = \sum_z p(x, z; \theta)
+$$
+
+$$
+Q(z) = \frac{p(x, z; \theta)}{\sum_z p(x, z; \theta)}
+$$
+
+$$
+= \frac{p(x, z; \theta)}{p(x; \theta)}
+$$
+
+$$
+= p(z | x; \theta)
+$$
+</Derivation>
+
+<Derivation className="mt-0 mb-3">
+We can verfiy that setting $Q(z) = p(z | x; \theta)$ leads to a tight bound:
+
+$$
+\sum_z \left[Q(z) \log\frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+
+$$
+= \sum_z \left[p(z | x; \theta) \log\frac{p(x, z; \theta)}{p(z | x; \theta)}\right]
+$$
+
+$$
+= \sum_z \left[p(z | x; \theta) \log\frac{p(z | x; \theta)p(x ; \theta)}{p(z | x; \theta)}\right]
+$$
+
+$$
+= \sum_z p(z | x; \theta) \log p(x ; \theta)
+$$
+
+$$
+= \log p(x ; \theta) \left(\sum_z p(z | x; \theta)\right)
+$$
+
+<Info>
+$$
+= \log p(x ; \theta)
+$$
+
+Since $Q(z) = p(z | x; \theta)$ and $\sum_z Q(z) = 1$
+</Info>
+</Derivation>
+
+For convenience, let's define Evidence Lower Bound (ELBO) as:
+
+$$
+\text{ELBO}(x; Q, \theta) = \mathbb{E}_{z \sim Q(z)}\left[\log\frac{p(x, z; \theta)}{Q(z)}\right] = \sum_z \left[Q(z) \log\frac{p(x, z; \theta)}{Q(z)}\right]
+$$
+
+Therefore,
+
+$$
+\log p(x; \theta) \geq \text{ELBO}(x; Q, \theta)
+$$
+
+```python
+def e_step(X, theta):
+    """E-step: Compute Q_i(z^(i)) = p(z^(i) | x^(i); θ)"""
+    Q = []
+    for i in range(len(X)):
+        q_i = posterior_distribution(X[i], theta)  # p(z^(i) | x^(i); θ)
+        Q.append(q_i)
+    return Q
+
+def m_step(X, Q):
+    """M-step: θ ← argmax_θ Σ ELBO(x^(i); Q_i, θ)"""
+    theta_new = maximize_elbo(X, Q)
+    return theta_new
+
+for iteration in range(100):
+    # E-step: For each i, set Q_i(z^(i)) ← p(z^(i) | x^(i); θ)
+    Q = e_step(X, theta)
+        
+    # M-step: Set θ ← argmax_θ Σ ELBO(x^(i); Q_i, θ)
+    theta = m_step(X, Q)
+```
+
+In the $E$ step we find the estimated distributions over $z^{(i)}$ using our current value of $\theta$ and thus our current estimated distribution over $x^{(i)}$ given $z^{(i)}$. We do so using the Bayes' rule:
+
+$$
+p(z^{(i)} = j | x^{(i)}; \theta) = \frac{p(x^{(i)} | z^{(i)} = j; \theta) p(z^{(i)} = j; \theta)}{\sum_{l=1}^k p(x^{(i)} | z^{(i)} = l; \theta) p(z^{(i)} = l; \theta)}
+$$
+
+In the $M$ step we update the value of $\theta$ to maximizes the $\text{ELBO}$ for which it is equal to $\log p(x; \theta)$ for our current values of $\theta$.
+
+<Margin />
+
+## Proof of Convergence
+
+It can be shown that the EM algorithm converges to the maximum likelihood estimate of $\theta$ as the number of iterations goes to infinity.
+
+We saw that the for any given value of $\theta$ and any distribution over $z$, our log-likelihood $\ell(\theta) = \log p(x;\theta)$ is always greater than the $\text{ELBO}(x; Q, \theta)$.
+
+Hence, 
+
+$$
+\ell(\theta^{(t+1)}) \geq \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t+1)})
+$$
+
+Moreover, since in the $M$ step, $\theta^{(t+1)}$ is chosen to maximize $\text{ELBO}(x; Q^{(t)}, \theta^ {(t)})$:
+
+Therefore,
+
+$$
+\sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t+1)}) \geq \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t)})
+$$
+
+Finally, in the $E$ step, $Q(z)$ is choosen such that for the current value of $\theta$, the log-likelihood and the evidence lower bound are equal.
+
+$$
+\sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t)}) = \ell(\theta^{(t)})
+$$
+
+Putting it all together, we have the following 
+
+$$
+\ell(\theta^{(t+1)}) \geq \ell(\theta^{(t)})
+$$
+
+Note that the reason we wanted a tight bound on our inequality was to guarantee convergence. Otherwise after the $E$ step, our $\text{ELBO}(x; Q^{(t)}, \theta^{(t)})$ could have been lower than our log-likelihood $\ell(\theta^{(t)})$. This would've meant that $\ell(\theta^{(t+1)})$ could have been lower than $\ell(\theta^{(t)})$.
+
+<Margin />
+
+## Other Interpretations
+
+The evidence lower bound can be rewritten as:
+
+$$
+\text{ELBO}(x; Q, \theta) = \mathbb{E}_{z \sim Q} \left[ \log p(x \mid z; \theta) \right] - D_{KL}(Q \parallel p_z)
+$$
+
+This would mean that maximizing $\text{ELBO}$ over $\theta$ is equivalent to maximizing $p(x | z; \theta)$ since the KL-divergence term does not depend on $\theta$.
+
+<Derivation>
+<Lemma>
+For any two distributions over a random variable $z$, the KL-divergence between the two distributions is given by:
+
+$$
+D_{KL}(Q \parallel p) = \sum_z \left[Q(z) \log \frac{Q(z)}{p(z)} \right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[ \log \frac{Q(z)}{p(z)} \right]
+$$
+</Lemma>
+
+$$
+\text{ELBO}(x; Q, \theta) = \mathbb{E}_{z \sim Q} \left[\log \frac{p(x, z; \theta)}{Q(z)} \right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log \frac{p(x | z; \theta)p(z)}{Q(z)} \right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} [\log p(x | z; \theta) + \log p(z) - \log Q(z)]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log p(x | z; \theta) - \log \frac{Q(z)}{p(z)}\right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log p(x | z; \theta)\right] - \mathbb{E}_{z \sim Q} \left[\log \frac{Q(z)}{p(z)}\right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[ \log p(x \mid z; \theta) \right] - D_{KL}(Q \parallel p_z)
+$$
+</Derivation>
+
+Similarly, the evidence lower bound can also be rewritten as:
+
+$$
+\text{ELBO}(x; Q, \theta) = \log p(x) - D_{KL}(Q \parallel p_{z | x})
+$$
+
+This shows us that $\text{ELBO}$ is maximized for a given value of $\theta$ when the KL divergence between $Q(z)$ and $p(z | x; \theta)$ is minimized, which is when they are equal. This is exactly what we saw while deriving the algorithm above.
+
+<Derivation>
+$$
+\text{ELBO}(x; Q, \theta) = \mathbb{E}_{z \sim Q} \left[\log \frac{p(x, z; \theta)}{Q(z)} \right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log \frac{p(z | x; \theta)p(x)}{Q(z)} \right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} [\log p(z | x; \theta) + \log p(x) - \log Q(z)]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log p(x) - \log \frac{Q(z)}{p(z | x; \theta)}\right]
+$$
+
+$$
+= \mathbb{E}_{z \sim Q} \left[\log p(x)\right] - \mathbb{E}_{z \sim Q} \left[\log \frac{Q(z)}{p(z | x; \theta)}\right]
+$$
+
+$$
+= \log p(x) - D_{KL}(Q \parallel p_{z | x})
+$$
+</Derivation>

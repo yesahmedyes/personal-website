@@ -15,6 +15,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/react": "^3.1.0",
+    "@next/mdx": "15.4.0-canary.51",
     "@prisma/client": "^5.14.0",
     "@radix-ui/react-checkbox": "^1.1.5",
     "@radix-ui/react-popover": "^1.1.7",
@@ -25,6 +28,7 @@
     "@trpc/client": "^11.0.0-rc.446",
     "@trpc/react-query": "^11.0.0-rc.446",
     "@trpc/server": "^11.0.0-rc.446",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "aos": "3.0.0-beta.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -35,6 +39,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-katex": "^3.0.1",
+    "react-syntax-highlighter": "^15.6.1",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "tailwind-merge": "^3.2.0",

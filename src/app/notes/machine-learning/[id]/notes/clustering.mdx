@@ -1,0 +1,30 @@
+<center>
+## K-means Algorithm
+</center>
+
+For a given dataset $x^{(1)}, \ldots, x^{(n)}$ without any labels $y^{(i)}$, clustering is the task of finding a partition of the data into subsets (clusters) such that the data points in the same cluster are more similar to each other than to those in other clusters. For this purpose, we usually use the k-means algorithm.
+
+```python
+n, d = X.shape
+
+centroids = np.random.randn(k, d)
+
+for _ in range(max_iters):
+    distances = np.zeros(n, dtype=int)
+
+    for i in range(n):
+        distances[i] = np.argmin(np.linalg.norm(X[i] - centroids, axis=1))
+
+    for j in range(k):
+        centroids[j] = X[distances == j].mean(axis=0)
+```
+
+The first loop gives us the centroid $c^{(i)}$ that is closest to each data point $x^{(i)}$. The second loop updates the centroid $\mu_j$ for each cluster $j$ as the mean of all data points $x^{(i)}$ assigned to that cluster.
+
+The distortion function (that measures the sum of the squared distances between each data point and its assigned centroid) can be written as:
+
+$$
+J(c, \mu) = \sum_{i=1}^n \| x^{(i)} - \mu_{c^{(i)}} \|^2
+$$
+
+In each step of the k-means algorithm, $J$ either decreases or stays the same. Therefore, the algorithm is guaranteed to converge. However, the convergence is not guaranteed to reach a global minimum since $J$ is non-convex.

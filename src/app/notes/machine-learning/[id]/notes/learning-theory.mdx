@@ -1,0 +1,387 @@
+<center>
+# Learning Theory
+</center>
+
+## Bias-Variance Tradeoff
+
+Let $S$ be our set of training examples that are related using the following equation:
+
+$$
+y^{(i)} = h^*(x^{(i)}) + \xi^{(i)}
+$$
+
+where $h^*$ is the best possible classifier that maps the relationship between $x$ and $y$, and $\xi^{(i)} \in \mathcal{N}(0, \sigma^2)$ is the noise in the $ith$ example.
+
+Also, let ${h}_s$ be our best fit model for the dataset $S$. The Mean Squared Error (MSE) can be written as:
+
+$$
+\mathbb{E} \left[ (y - h_{s}(x))^2 \right]
+$$
+
+Also, let $h_{avg}(x) = \mathbb{E}\left[h_s(x)\right]$ be the "average model" - the model obtained by drawing an infinite number of datasets, training on them, and averaging their predictions on $x$.
+
+Then, the Mean Squared Error can be further broken down into 3 components:
+
+$$
+\mathbb{E} \left[ (y - h_s(x))^2 \right] = \sigma^2 + \underbrace{\left( h^*(x) - h_{\text{avg}}(x) \right)^2}_{\text{bias}^2} + \underbrace{\text{var}(h_s(x))}_{\text{variance}}
+$$
+
+The first part is the unavoidable error. It is the noise in the data that cannot be explained by any model, regardless of its complexity.
+
+The bias is the error introduced by the "expressivity handicap" of our classifier. This error occurs because of underfitting.
+
+The variance is the error that measures how much the model's predictions would change if it were trained on a different dataset.
+
+<Derivation>
+<Lemma>
+For two independent events A and B such that $\mathbb{E}[A] = 0$
+
+$$
+\mathbb{E}\left[(A+B)^{2}\right] = \mathbb{E}\left[A^2 + B^2 + 2AB \right]
+$$
+
+$$
+= \mathbb{E}[A^2] + \mathbb{E}[B^2] + 2\mathbb{E}[AB]
+$$
+
+<Info>
+$$
+= \mathbb{E}[A^2] + \mathbb{E}[B^2] + 2\mathbb{E}[A]\mathbb{E}[B]
+$$
+
+For two indepedent events, their joint expectancy is the product of their individual expectancies.
+</Info>
+
+<Info>
+$$
+= \mathbb{E}[A^2] + \mathbb{E}[B^2]
+$$
+
+Since $\mathbb{E}[A] = 0$
+</Info>
+</Lemma>
+
+$$
+\mathbb{E} \left[ (y - h_{s}(x))^2 \right] = \mathbb{E} \left[ (y - h_{s}(x))^2 \right]
+$$
+
+$$
+= \mathbb{E} \left[ \left(h^*(x) + \xi - h_{s}(x)\right)^2 \right]
+$$
+
+$$
+= \mathbb{E} \left[ \left(\xi + (h^*(x) - h_{s}(x))\right)^2 \right]
+$$
+
+<Info>
+$$
+= \mathbb{E}\left[\xi^2\right] + \mathbb{E} \left[ \left(h^*(x) - h_{s}(x)\right)^2\right]
+$$
+
+Since $\mathbb{E}[\xi] = 0$ because the noise is normally distributed with mean $0$, we use the identity we prove above
+</Info>
+
+<Info>
+$$
+= \sigma^2 + \mathbb{E} \left[ \left(h^*(x) - h_{s}(x)\right)^2\right]
+$$
+
+$\mathbb{E}[\xi^2] = \mathbb{E}[\xi^2] - (\mathbb{E}[\xi])^2$ since $\mathbb{E}[\xi] = 0$. This is just the variance which is equal to $\sigma^2$.
+</Info>
+
+$$
+= \sigma^2 + \mathbb{E}\left[\left(h^*(x) - h_{avg}(x) + h_{avg}(x) - h_{s}(x)\right)^2\right]
+$$
+
+Since $h_{avg}(x) = \mathbb{E}[h_s(x)]$, therefore:
+
+<Info>
+$$
+\mathbb{E}\left[h_{avg}(x) - h_s(x)\right] = h_{avg}(x) - \mathbb{E}\left[h_s(x)\right] = 0
+$$
+
+$\mathbb{E}\left[h_{avg}(x)\right] = h_{avg}(x)$ since it's a constant.
+</Info>
+
+Also, 
+
+$$
+\mathbb{E}\left[\left(h_{avg}(x) - h_s(x)\right)^2\right] = \mathbb{E}\left[\left(\mathbb{E}[h_s(x)] - h_s(x)\right)^2\right] = \text{var}(h_s(x))
+$$
+
+Now finally, we can rewrite our Mean Squared Error as:
+
+<Info>
+$$
+\sigma^2 + \mathbb{E}\left[\left(h^*(x) - h_{avg}(x)\right)^2\right] + \mathbb{E}\left[\left(h_{avg}(x) - h_{s}(x)\right)^2\right]
+$$
+
+Using the identity we prove above and the fact that:
+
+$$
+\mathbb{E}\left[h_{avg}(x) - h_{s}(x) \right] = 0
+$$
+</Info>
+
+<Info>
+$$
+= \sigma^2 + \left(h^*(x) - h_{avg}(x)\right)^2 + \mathbb{E}\left[\left(h_{avg}(x) - h_{s}(x)\right)^2\right]
+$$
+
+$h_{avg}(x)$ and $h^*(x)$ are both constants.
+</Info>
+
+$$
+\sigma^2 + \left(h^*(x) - h_{avg}(x)\right)^2 + \text{var}(h_s(x))
+$$
+</Derivation>
+
+The Bias-Variance tradeoff tells us that as we increase the number of parameters in our neural network, the test error will decrease because the bias is decreasing. However, after a certain point the variance starts increasing faster than the bias is decreasing and therefore, the test error will start to increase.
+
+In reality, however, we see a double descent phenomenon wherein the test error starts to decrease again at the point where the number of parameters $d$ are approximately equal to the number of training examples $d$. This is called the over-parameterization regime.
+
+<Margin />
+
+## Complexity Bounds
+
+For any hypothesis $h$, the true error is given by:
+
+$$
+\epsilon(h) = P(h(x) \neq y)
+$$
+
+However, since we have no way of determining the underlying probability distribution $\mathcal{D}$, we cannot determine the true error of the hypothesis. Instead, we estimate the empirical error of the hypothesis over our $n$ training examples.
+
+$$
+\hat{\epsilon}(h) = \frac{1}{n} \sum_{i=1}^{n} 1\{h(x_i) \neq y_i\}
+$$
+
+Let $\mathcal{H}$ be the set of all possible hypotheses that we are considering. To find the hypothesis that minimizes the empirical error over our training set, we find:
+
+$$
+\hat{h} = argmin_{h \in \mathcal{H}} \hat{\epsilon}(h)
+$$
+
+<Detour about="Hoeffding Inequality">
+Hoeffding inequality states that for $n$ independent random variables drawn from a Bernoulli distribution i.e. $P(Z_i = 1) = \phi$ and $P(Z_i = 0) = 1 - \phi$, the following inequality holds:
+
+$$
+P\left( \left|\phi - \hat{\phi}\right| > \gamma \right) \leq 2\exp\left(-2\gamma^2 n\right)
+$$
+
+where $\hat{\phi} = \frac{1}{n} \sum_{i=1}^{n} Z_i$ and $\gamma$ is some constant greater than 0.
+
+Imagine a biased coin that comes up heads with a probability of $\phi$. We toss this coin $n$ times and record the average number of times we got heads. We denote this average by $\hat{\phi}$.
+
+The probability that "the true probability of getting heads is away from our estimated probability by a difference more than $\gamma$" is denoted by $P(|\phi - \hat{\phi}| > \gamma)$. This is always less than or equal to $2\exp\left(-2\gamma^2 n\right)$.
+</Detour>
+
+Using Hoeffding inequality, we note that the true error and the estimated empirical error of our selected hypothesis follow the following inequality:
+
+$$
+P\left( \left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | > \gamma \right) \leq 2\exp\left(-2\gamma^2 n\right)
+$$
+
+Now we want to find an inequality for our entire set of hypotheses $\mathcal{H} = \{ h_1, \dots, h_k \}$. We see that the following inequality holds:
+
+$$
+P\left(\forall h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \gamma \right) \geq 1 - 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+We call this the uniform convergence result.
+
+This means that as n increases, the probability of the true error being close to the empirical error is bounded by a bigger value. Whereas, as we increases the number of hypotheses in our set, this probability is actually bounded by a smaller value.
+
+In the context of learning, we can say that the more complex our model, the lower our probability of minimizing the empirical error. And the more the number of training examples, the higher our probability of minimizing the empirical error.
+
+<Derivation>
+<Lemma>
+For any k events the union bound of probabilities tells us that
+
+$$
+P(A_1 \cup \cdots \cup A_k) \leq P(A_1) + P(A_2) + ... + P(A_k)
+$$
+</Lemma>
+
+The probability that there exists a hypothesis in our set $\mathcal{H}$ for which the difference between the empirical error and the true error is more than $\gamma$ can be written as:
+
+$$
+P\left(\exists h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | > \gamma \right)
+$$
+
+Let $A_i$ be the event that $|\epsilon(h_i) - \hat{\epsilon}(h_i) | > \gamma$. Then:
+
+$$
+P\left(\exists h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | > \gamma \right)
+$$
+
+$$
+= P(A_1 \cup \cdots \cup A_k)
+$$
+
+$$
+\leq P(A_1) + P(A_2) + ... + P(A_k)
+$$
+
+$$
+\leq \sum_{i=1}^k 2\exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+= 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+Thus,
+
+$$
+P\left(\exists h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | > \gamma \right) \leq 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow 1 - P\left(\exists h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | > \gamma \right) > 1 - 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow P\left(\forall h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \gamma \right) \geq 1 - 2k\exp\left(-2\gamma^2 n\right)
+$$
+</Derivation>
+
+Now let $\delta = 2k\exp\left(-2\gamma^2 n\right)$
+
+We see that if we want the probability of "the true error being within $\gamma$ to the empirical error for all hypothesiss under our consideration" to be at least $1 - \delta$, our $n$ needs to be atleast as large as:
+
+$$
+n \geq \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
+$$
+
+<Derivation>
+$$
+\delta = 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow \frac{\delta}{2k} = \exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow \log\left(\frac{\delta}{2k}\right) = -2\gamma^2 n
+$$
+
+$$
+\Rightarrow -\frac{1}{2\gamma^2}\log\left(\frac{\delta}{2k}\right) = n
+$$
+
+<Info>
+$$
+\Rightarrow \frac{1}{2\gamma^2}\log\left(\frac{2k}{\delta}\right) = n
+$$
+
+$-log(a) = log\left(\frac{1}{a}\right)$
+</Info>
+
+If $n$ is equal to the left hand value, then
+
+$$
+P\left(\forall h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \gamma \right) \geq 1 - \delta
+$$
+
+Therefore n need to be atleast as large as:
+
+$$
+\Rightarrow n \geq \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
+$$
+</Derivation>
+
+Similarly, we can also see that given $k$ and $n$, the difference between the true error and the empirical error (for all hypotheses is our set) will always be less than:
+
+$$
+\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}
+$$
+
+<Derivation>
+$$
+\delta = 2k\exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow \frac{\delta}{2k} = \exp\left(-2\gamma^2 n\right)
+$$
+
+$$
+\Rightarrow \log\left(\frac{\delta}{2k}\right) = -2\gamma^2 n
+$$
+
+$$
+\Rightarrow -\frac{1}{2n}\log\left(\frac{\delta}{2k}\right) = \gamma^2
+$$
+
+$$
+\Rightarrow \sqrt{\frac{1}{2n}\log\frac{2k}{\delta}} = \gamma
+$$
+
+If $\gamma$ is equal to the left hand value, then:
+
+$$
+P\left(\forall h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \gamma \right) \geq 1 - \delta
+$$
+
+Therefore the difference in the true and empirical error will always be less than or equal to:
+
+$$
+\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}
+$$
+</Derivation>
+
+Next, in our set of hypothesiss $\mathcal{H}$, let $h^*$ be the hypothesis that minimizes the true error and $\hat{h}$ be the hypothesis that minimizes our empirical error.
+
+Using our uniform convergence assumption, we can see that:
+
+$$
+\epsilon(\hat{h}) \leq \epsilon(h^*) + 2\sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}
+$$
+
+With a probability of $1 - \delta$, the true error of our selected hypothesis is less than or equal to the true error of the best hypothesis + some term that depends on the number of hypotheses and the number of training examples.
+
+The first term on the right can be thought of as the bias. And the second term can be thought of as the variance. We see that as we increase k, the first term either stays the same or potentially decreases. Whereas, the second term increases.
+
+This is similar to what we saw in the Bias-Variance tradeoff. As we increase the complexity of our model, variance increases and the potential for our model to overfit also increases.
+
+<Derivation>
+$$
+\left| \epsilon(\hat{h}) - \hat{\epsilon}(\hat{h}) \right| \leq \gamma
+$$
+
+<Info>
+$$
+\Rightarrow \epsilon(\hat{h}) \leq \hat{\epsilon}(\hat{h}) + \gamma
+$$
+
+Using uniform convergence and the fact that $\hat{h}$ minimizes empirical error
+</Info>
+
+<Info>
+$$
+\leq \hat{\epsilon}(h^*) + \gamma
+$$
+
+$\hat{h}$ by definition minimizes our estimated empirical error.
+</Info>
+
+<Info>
+$$
+\leq \epsilon(h^*) + 2\gamma
+$$
+
+Using uniform convergence and the fact that $h^*$ minimizes true error, we know that $\hat{\epsilon}(h^*) \leq \epsilon(h^*) + \gamma$
+</Info>
+
+Thus, 
+
+$$
+\epsilon(\hat{h}) \leq \epsilon(h^*) + 2\gamma
+$$
+
+$$
+\epsilon(\hat{h}) \leq \epsilon(h^*) + 2\sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}
+$$
+</Derivation>

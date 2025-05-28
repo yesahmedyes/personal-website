@@ -1,0 +1,155 @@
+# Variational Autoencoders
+
+Let $z$ be a latent variable such that, $z \sim \mathcal{N}(0, I)$, and let $\theta$ be the collections of weights of a neural network $g(z ; \theta)$ that maps $z \in R^k$ to $R^d$.
+
+Also, let $x$ given $z$ follow a normal distribution $x | z \sim \mathcal{N}\left(g(z ; \theta), \, \sigma^2 I \right)$. We can find this distribution using an [Expectation Maximization Algorithm](em-algorithm).
+
+Note that for [Gaussian Mixture Models](gaussian-mixture-models), the optimal choice of $Q(z) = p(z | x; \theta)$ and we found it using Bayes' rule. We were able to do so because $z$ was discrete and could take only $k$ values.
+
+However, for more complex models like the Variational Autoencoder, $z$ is continous. Therefore, it is intractable to compute $p(z | x; \theta)$ explicitly. Instead, we will try to find an approximation of $p(z | x; \theta)$.
+
+Also note that we wanted to find $Q(z) = p(z | x; \theta)$ so that our $\text{ELBO}$ would be tight with $\log p(x; \theta)$.
+
+Since,
+
+$$
+\text{ELBO}(x; Q, \theta) = \log p(x ; \theta) - D_{KL}(Q \parallel p_{z | x})
+$$
+
+Therefore,
+
+$$
+\log p(x ; \theta) = \text{ELBO}(x; Q, \theta) + D_{KL}(Q \parallel p_{z | x})
+$$
+
+From this we can see that if we choose a $Q(z)$ such that it maximizes our $\text{ELBO}$ for a given value of $\theta$, then our KL-divergence is minimized.
+
+From this, we can find an approximate value for $p(z | x; \theta)$ by choosing a $Q$ from our family of distributions $\mathcal{Q}$:
+
+$$
+p(z | x; \theta) \approx \argmax_{Q \in \mathcal{Q}} \left( \max_{\theta} \text{ELBO}(x; Q, \theta) \right)
+$$
+
+We make a mean field assumption that assumes that $Q(z)$ gives a distribution with independent coordinates which means that we can decompose $Q(z)$ into $Q^1(z_1) \ldots Q^k(z_k)$.
+
+Finally, we assume that $Q$ is a normal distribution where the mean and variance come from the neural networks $q(x; \phi)$ and $v(x; \psi)$ respectively. We set the covariance matrix to be a diagonal to enforce our mean field assumption. We can write this as:
+
+$$
+Q_i(z^{(i)}) = \mathcal{N}\left(q(x^{(i)}; \phi), \, \text{diag}(v(x^{(i)}; \psi))^2 \right)
+$$
+
+We use this $Q_i(z^{(i)})$ to find our $\text{ELBO}$ for the $M$ step.
+
+$$
+\text{ELBO}(x; \phi, \psi, \theta) = \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log \frac{p(x^{(i)} z^{(i)}; \theta)}{Q_i(z^{(i)})} \right]
+$$
+
+Note that we no longer need the $E$ step because we are directly using our $Q_i(z^{(i)})$. Therefore, instead of alternating maximization, we can use gradient ascent.
+
+$$
+\theta \leftarrow \theta + \eta \, \nabla_{\theta} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right)
+$$
+
+$$
+\phi \leftarrow \phi + \eta \, \nabla_{\phi} \, \text{ELBO}\left(x^{(i)}; \,\phi, \psi, \theta \right)
+$$
+
+$$
+\psi \leftarrow \psi + \eta \, \nabla_{\psi} \, \text{ELBO}\left(x^{(i)}; \,\phi, \psi, \theta \right)
+$$
+
+Taking the derivative of our $\text{ELBO}$ with respect to $\theta$, we get:
+
+$$
+\nabla_{\theta} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \nabla_{\theta} \, \log p(x^{(i)} \mid z^{(i)}; \theta) \right]
+$$
+
+Similarly, taking the derivative of our $\text{ELBO}$ with respect to $\phi$ and $\psi$, we get:
+
+$$
+\nabla_{\phi} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \left[\nabla_{\phi} \log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - \nabla_{\phi} \, D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right ]
+$$
+
+$$
+\nabla_{\psi} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \left[\nabla_{\psi} \log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - \nabla_{\psi} \, D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right ]
+$$
+
+where $\hat{z}^{(i)}$ is just the reparameterized version of $z^{(i)}$ and $\hat{z}^{(i)} = q(x^{(i)}; \, \phi) + v(x^{(i)}; \, \psi) \odot \xi^{(i)}$
+
+We can find all three derivatives by backpropagating through their respective neural networks.
+
+$p(x^{(i)} \mid z^{(i)}; \theta)$ depends on the decoder neural network $g(z^{(i)} ; \theta)$. And $Q_i(z^{(i)})$ depends on the encoder neural networks $q(x^{(i)}; \phi)$ and $v(x^{(i)}; \psi)$.
+
+Ofcourse, since we still have an expectancy, we will have to take multiple samples of $z^{(i)}$ in case of $\theta$, and $\xi^{(i)}$ in case of $\psi$ and $\phi$ and then take an average over the derivatives.
+
+<Derivation className="mt-3 mb-0">
+$$
+\nabla_{\theta} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \nabla_{\theta} \, \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log \frac{p(x^{(i)}, z^{(i)}; \theta)}{Q_i(z^{(i)})} \right]
+$$
+
+$$
+= \nabla_{\theta} \, \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log p(x^{(i)} | z^{(i)}; \theta) + \log p(z^{(i)}; \theta) - \log Q_i(z^{(i)}) \right]
+$$
+
+$$
+= \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \nabla_{\theta} \, \log p(x^{(i)} | z^{(i)}; \theta) + \nabla_{\theta} \, \log p(z^{(i)}; \theta) - \nabla_{\theta} \, \log Q_i(z^{(i)}) \right]
+$$
+
+<Info>
+$$
+= \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \nabla_{\theta} \, \log p(x^{(i)} | z^{(i)}; \theta) \right]
+$$
+
+The other terms are not dependent on $\theta$
+</Info>
+</Derivation>
+
+<Derivation className="mt-0 mb-3">
+<Lemma>
+For any random variable that follows a normal distribution $x \sim \mathcal{N}(\mu, \sigma^2)$, it can be written in terms of $\xi$ where $\xi \sim \mathcal{N}(0, 1)$.
+
+$$
+x = \mu + \sigma \cdot \xi
+$$
+</Lemma>
+
+$$
+\nabla_{\phi} \, \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \nabla_{\phi} \, \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log \frac{p(x^{(i)}, z^{(i)}; \theta)}{Q_i(z^{(i)})} \right]
+$$
+
+$$
+= \nabla_{\phi} \, \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log p(x^{(i)} \mid z^{(i)}; \theta) + \log p(z^{(i)}) - \log Q_i(z^{(i)}) \right]
+$$
+
+$$
+= \nabla_{\phi} \, \sum_{i=1}^n \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log p(x^{(i)} \mid z^{(i)}; \theta) - \log \frac{Q_i(z^{(i)})}{p(z^{(i)}; \theta)} \right]
+$$
+
+<Info>
+$$
+= \nabla_{\phi} \, \sum_{i=1}^n \left( \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \log p(x^{(i)} \mid z^{(i)}; \theta) \right] - D_{KL}\left(Q_i(z^{(i)}) \parallel p(z^{(i)} \right) \right)
+$$
+
+$$
+D_{KL}(Q \parallel p) = \mathbb{E}_{z \sim Q} \left[ \log \frac{Q(z)}{p(z)} \right]
+$$
+</Info>
+
+However, since $Q_i$ depends on $\phi$, therefore $\nabla_{\phi} \, \mathbb{E}_{z^{(i)} \sim Q_i} [f(\phi)] \neq \mathbb{E}_{z^{(i)} \sim Q_i} [\nabla_{\phi} \, f(\phi)]$. Therefore, since $z^{(i)} \sim Q_i$ and $Q_i(z^{(i)}) = \mathcal{N}\left(q(x^{(i)}; \, \phi), \text{ diag}(v(x^{(i)}; \, \psi))^2 \right)$, we can write $z^{(i)}$ as:
+
+$$
+z^{(i)} = q(x^{(i)}; \, \phi) + v(x^{(i)}; \, \psi) \odot \xi^{(i)}
+$$
+
+For convenience, i will use $\hat{z}^{(i)}$ as the reparameterized $z^{(i)}$. But ofcourse, $\hat{z}^{(i)} = z^{(i)}$. Now plugging $\hat{z}^{(i)}$ into the equation, we get:
+
+$$
+\nabla_{\phi} \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \nabla_{\phi} \, \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \, \left[\log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right]
+$$
+
+$$
+= \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \left[\nabla_{\phi} \log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - \nabla_{\phi} \, D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right ]
+$$
+
+The solution for the derivate of $\text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right)$ with respect to $\psi$ is similar.
+</Derivation>

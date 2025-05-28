@@ -1,0 +1,163 @@
+<center>
+# Independent Component Analysis
+</center>
+
+## Introduction
+
+We imagine there is some data $s \in \mathbb{R}^d$ that is generated via $d$ independent sources.
+
+We also have a mixing matrix $A \in \mathbb{R}^{d \times d}$ that mixes the sources to produce the observed data $x \in \mathbb{R}^d$.
+
+$$
+x = A s
+$$
+
+Repeated observations of the data give us a set of training samples $\{x^{(1)}, \ldots, x^{(n)} \}$ and we want to find the unmixing matrix $W = A^{-1}$ that allows us to reconstruct the sources.
+
+$$
+s = W x
+$$
+
+We suppose that the distribution of each source $s_j$ is given by $p_{s}(s_j)$ and is independent of the other sources. Therefore the joint distribution of the sources is:
+
+$$
+p(s) = \prod_{j=1}^d p_{s}(s_j)
+$$
+
+<Detour about="Change of Variables in Probability">
+For any two vectors that are linearly related by $s = Wx$, the absolute value of the determinant of the transformation matrix $W$ gives the factor by which the volume of any region in the space changes.
+
+Therefore, if we have a probability distribution $p(s)$, the probability distribution of the transformed variables $p(x)$ is given by:
+
+$$
+p(s) = \frac{1}{|W|} \cdot p(x)
+$$
+</Detour>
+
+Since $s = W x$, the distribution of the sources in terms of the data is:
+
+$$
+p(s)\cdot|W| = p(x)
+$$
+
+Therefore the distribution of the data in terms of the sources is:
+
+$$
+p(x) = \left( \prod_{j=1}^d p_{s}(w_j^T x) \right) \cdot |W|
+$$
+
+We want to choose a monotonically increasing function that increases from $0$ to $1$ to be the CDF of our probability distribution. The derivative of the CDF will give us our probability density function. Choosing Sigmoid to be our CDF, we get:
+
+$$
+p(s) = g'(s)
+$$
+
+$$
+g(s) = \frac{1}{1 + \exp(-s)}
+$$
+
+The log-likelihood of the data is then given by:
+
+$$
+\ell(W) = \sum_{i=1}^n \left(\sum_{j=1}^d \log g'(w_j^T x^{(i)}) \right) + \log |W|
+$$
+
+Taking the derivative of the log-likelihood with respect to $W$ and setting it to 0, we get the following gradient descent update rule:
+
+$$
+W \leftarrow W + \alpha \left( \left( \begin{array}{c} 1 - 2g(w_1^T x^{(i)}) \\ 1 - 2g(w_2^T x^{(i)}) \\ \vdots \\ 1 - 2g(w_d^T x^{(i)}) \end{array} \right) \left(x^{(i)}\right)^T + \left(W^{-1}\right)^T \right)
+$$
+
+<Derivation>
+<Lemma>
+The derivative of the sigmoid function is equal to:
+
+$$
+g'(z) = g(z)\left(1 - g(z)\right)
+$$
+</Lemma>
+
+<Info>
+$$
+\nabla_{w_k} \, \ell(W) = \nabla_{w_k} \left(\, \sum_{i=1}^n \log g'\left(w_k^T x^{(i)}\right) + \log |W| \right)
+$$
+
+Ignoring terms that do not depend on $w_k$
+</Info>
+
+$$
+= \sum_{i=1}^n \frac{1}{g'\left(w_k^T x^{(i)}\right)} \cdot \nabla_{w_k} \, g'\left(w_k^T x^{(i)}\right) + \frac{1}{|W|} \cdot \nabla_{w_k} |W|
+$$
+
+<Info>
+$$
+= \sum_{i=1}^n \frac{1}{g'\left(w_k^T x^{(i)}\right)} \cdot \nabla_{w_k} \, \left[g \left(w_k^T x^{(i)} \right) \left(1 - g\left(w_k^T x^{(i)}\right)\right)\right] + \left(W^{-1}\right)_k^T
+$$
+
+The derivative of the determinant is given by:
+
+$$
+\nabla_W \, |W| = |W| \left(W^{-1}\right)^T
+$$
+
+Therefore,
+
+$$
+\nabla_{w_k} \, |W| = |W| \left(W^{-1}\right)_k^T
+$$
+</Info>
+
+<Info>
+$$
+= \sum_{i=1}^n \frac{1}{g'\left(w_k^T x^{(i)}\right)} \cdot \left[g \left(w_k^T x^{(i)} \right) \cdot \nabla_{w_k} \, \left(1 - g\left(w_k^T x^{(i)}\right)\right) + \left(1 - g\left(w_k^T x^{(i)}\right)\right) \cdot \nabla_{w_k} \, g \left(w_k^T x^{(i)} \right) \right] + \left(W^{-1}\right)_k^T
+$$
+
+Using the derivative product rule
+</Info>
+
+$$
+= \sum_{i=1}^n \frac{1}{g\left(w_k^T x^{(i)}\right) \left(1 - g\left(w_k^T x^{(i)}\right)\right)} \cdot \left[-g \left(w_k^T x^{(i)} \right) \cdot g \left(w_k^T x^{(i)} \right) \left(1 - g \left(w_k^T x^{(i)} \right)\right) \cdot \left(x^{(i)}\right)^T \right.
+$$
+
+$$
+\left. + \left(1 - g\left(w_k^T x^{(i)}\right)\right) \cdot g \left(w_k^T x^{(i)} \right) \left(1 - g \left(w_k^T x^{(i)} \right)\right) \cdot \left(x^{(i)}\right)^T \right] + \left(W^{-1}\right)_k^T
+$$
+
+$$
+= \sum_{i=1}^n \left[-g \left(w_k^T x^{(i)} \right) + \left(1 - g\left(w_k^T x^{(i)}\right)\right) \right] \cdot \left(x^{(i)}\right)^T + \left(W^{-1}\right)_k^T
+$$
+
+$$
+= \sum_{i=1}^n \left(\left(1 - 2 \, g(w_k^T x^{(i)}\right) \cdot \left(x^{(i)}\right)^T \right) + \left(W^{-1}\right)_k^T
+$$
+
+Therefore,
+
+$$
+\nabla_W \, \ell(W)  = \left( \begin{array}{c} 1 - 2g(w_1^T x^{(i)}) \\ 1 - 2g(w_2^T x^{(i)}) \\ \vdots \\ 1 - 2g(w_d^T x^{(i)}) \end{array} \right) \left(x^{(i)}\right)^T + \left(W^{-1}\right)^T
+$$
+</Derivation>
+
+<Margin />
+
+## Limitations
+
+There are certain scenarios where Independent Component Analysis (ICA) might not work well:
+
+- If our unmixing matrix $W$ is multiplied by a permutation matrix $P$, there is no way for us to know about it. In this case we won't be able to know which signal was from which source.
+
+$$
+W \rightarrow PW
+$$
+
+- If a row in the unmixing matrix $W$ is scaled by a constant $\alpha$, this will just result in the corresponding source being scaled by $1/\alpha$. There is no way for us to know if scaling has occurred. Therefore, we won't be able to retrieve the true amplitude of our signal.
+
+- If the data $x$ follows a gaussian distribution, then our sources $s$ will also follow a gaussian distribution. And gaussian distributions are symmetric in nature. Therefore, if our unmixing matrix $W$ is multiplied by a rotation or reflection matrix $R$, there is no way for us to know about it.
+
+$$
+W \rightarrow RW
+$$
+
+Moreover, we have assumed that our data points are independent and identically distributed. This is however, not true for time-series data.
+
+Despite all these limitations, ICA still works very well given enough data.

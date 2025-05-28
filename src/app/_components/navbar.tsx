@@ -14,20 +14,12 @@ export default function Navbar() {
       href: "/",
     },
     {
-      name: "Literature Reviews",
-      href: "/literature-reviews",
-    },
-    {
-      name: "Research",
-      href: "/research",
+      name: "Blogs",
+      href: "/blogs",
     },
     {
       name: "Notes",
       href: "/notes",
-    },
-    {
-      name: "Assignments",
-      href: "/assignments",
     },
   ];
 
@@ -46,7 +38,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`flex flex-row text-textDarkGray font-normal py-6 lg:py-10 px-6`}>
+    <nav className={`flex flex-row text-textDarkGray font-normal py-6 lg:py-8 px-6`}>
       <button className="lg:hidden ml-auto" onClick={toggleMenu}>
         <HambergerMenu className={`stroke-textBlack`} />
       </button>

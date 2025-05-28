@@ -1,0 +1,163 @@
+<center>
+# Kernel Methods
+</center>
+
+## Introduction
+
+The gradient descent update for the least mean squares looks like this:
+
+$$
+\theta \leftarrow \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T x^{(i)}\right)x^{(i)}
+$$
+
+However, sometimes our data is not linearly separable. For this, we can use a feature mapping to transform the data into a higher-dimensional space, and then apply the gradient descent as follows:
+
+$$
+\theta \leftarrow \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T \phi(x^{(i)})\right)\phi(x^{(i)})
+$$
+
+However, this can become computationally expensive if the feature mapping is too complex. For example, if $\phi(x)$ is a vector that contains all the monomials of $x$ with degree $\leq 3$, then the dimension of our features are $d^3$ where $d$ is the dimension of $x$.
+
+This would mean that $\theta$ would also have $d^3$ parameters and we will need to compute $d^3$ gradient updates.
+
+To fix this, we first assume that $\theta$ can be represented as a linear combination of our training examples (or their feature mappings):
+
+$$
+\theta = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})
+$$
+
+We can then rewrite the gradient descent update as follows:
+
+$$
+\theta \leftarrow \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T \phi(x^{(i)})\right)\phi(x^{(i)})
+$$
+
+$$
+\theta \leftarrow \sum_{i=1}^{n} \beta_i \phi(x^{(i)}) + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T \phi(x^{(i)})\right)\phi(x^{(i)})
+$$
+
+$$
+\theta \leftarrow \sum_{i=1}^{n} \left( \underbrace{\beta_i + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right)}_{\text{new } \beta_i} \right) \phi(x^{(i)})
+$$
+
+With this, to fine the new $\theta$, we only need to compute the new $\beta_i$'s for all of our training examples. And the new $\beta_i$'s can be found using the following update:
+
+$$
+\beta_i \leftarrow \beta_i + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right)
+$$
+
+$$
+\beta_i \leftarrow \beta_i + \alpha \left( y^{(i)} - \left(\sum_{j=1}^{n} \beta_j \phi(x^{(j)})\right)^T \phi(x^{(i)}) \right)
+$$
+
+$$
+\beta_i \leftarrow \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^{n} \beta_j \, \phi(x^{(j)})^T \phi(x^{(i)}) \right)
+$$
+
+To avoid having to compute the dot products of the feature mappings for all $i, j$, on each iteration, we can precompute a kernel function that contains all the dot products before the training starts.
+
+$$
+K(x^{(i)}, x^{(j)}) = \phi(x^{(i)})^T \phi(x^{(j)}) = \left\langle \phi(x^{(i)}), \phi(x^{(j)}) \right\rangle
+$$
+
+It would seem that this is still computationally expensive if we have a lot of training examples since each dot product takes only $O(d^3)$ operations. But in reality, a dot product can be broken down so that it takes $O(d)$ operations.
+
+<Derivation>
+$$
+\left\langle \phi(x), \, \phi(z) \right\rangle = 1 + \sum_{i=1}^{d} x_i z_i + \sum_{i,j \in \{1, \dots, d\}} x_i x_j z_i z_j + \sum_{i,j,k \in \{1, \dots, d\}} x_i x_j x_k z_i z_j z_k
+$$
+
+$$
+= 1 + \sum_{i=1}^{d} x_i z_i + \left( \sum_{i=1}^{d} x_i z_i \right)\left( \sum_{j=1}^{d} x_j z_j \right) + \left( \sum_{i=1}^{d} x_i z_i \right)\left( \sum_{j=1}^{d} x_j z_j \right)\left( \sum_{k=1}^{d} x_k z_k \right)
+$$
+
+$$
+= 1 + \sum_{i=1}^{d} x_i z_i + \left( \sum_{i=1}^{d} x_i z_i \right)^2 + \left( \sum_{i=1}^{d} x_i z_i \right)^3
+$$
+
+$$
+= 1 + \langle x, z \rangle + \langle x, z \rangle^2 + \langle x, z \rangle^3
+$$
+</Derivation>
+
+The update rule for $\beta_i$ is now:
+
+$$
+\beta_i \leftarrow \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^{n} \beta_j \, K(x^{(i)}, x^{(j)}) \right)
+$$
+
+Similarly, for inference, we can predict the value of a new example $x$ as follows:
+
+$$
+\theta^T \phi(x) = \sum_{i=1}^{n} \beta_i K(x^{(i)}, x)
+$$
+
+<Margin />
+
+# Validity of Kernels
+
+A kernel $K(x, z)$ is valid if there exists a feature mapping $\phi$ such that $K(x, z) = \left\langle \phi(x), \phi(z) \right\rangle$.
+
+One example of a valid kernel is the quadratic kernel. $K(x, z) = \left( x^T z + c \right)^2$. The feature mapping of this kernel is:
+
+$$
+\phi(x) = \begin{bmatrix} x_1 x_1 \\ x_1 x_2 \\ x_1 x_3 \\ x_2 x_1 \\ x_2 x_2 \\ x_2 x_3 \\ x_3 x_1 \\ x_3 x_2 \\ x_3 x_3 \\ \sqrt{2c} x_1 \\ \sqrt{2c} x_2 \\ \sqrt{2c} x_3 \\ c \end{bmatrix}
+$$
+
+<Derivation>
+$$
+K(x, z) = \left( x^T z + c \right)^2
+$$
+
+$$
+= \left( x^T z \right)^2 + 2c \left( x^T z \right) + c^2
+$$
+
+$$
+= \left( \sum_{i=1}^{d} x_i z_i \right)^2 + 2c \left( \sum_{i=1}^{d} x_i z_i \right) + c^2
+$$
+
+$$
+= \left( \sum_{i=1}^{d} x_i z_i \right)^2 + \left( \sum_{i=1}^{d} \left( x_i \sqrt{2c} \right) \left( z_i \sqrt{2c} \right) \right) + c^2
+$$
+</Derivation>
+
+There is another, more formal way to check if a kernel is valid. This is by checking if the kernel satisfies the Mercer's condition.
+
+Let $K$ denote the kernel matrix of a kernel function $K(x, z)$. If $K(x, z)$ is a valid kernel, then $K$ must be a positive semidefinite matrix.
+
+In other words, for any valid kernel matrix $K$, and any vector $z$, the following must hold:
+
+$$
+z^T K z = \sum_{i} \sum_{j} z_i K_{ij} z_j \geq 0
+$$
+
+<Derivation>
+$$
+z^T K z = \sum_{i} \sum_{j} z_i K_{ij} z_j
+$$
+
+$$
+= \sum_i \sum_j z_i \, \phi(x^{(i)})^T \phi(x^{(j)}) \, z_j
+$$
+
+$$
+= \sum_i \sum_j z_i \left( \sum_k \phi_k(x^{(i)}) \phi_k(x^{(j)}) \right) z_j
+$$
+
+$$
+= \sum_k \sum_i \sum_j z_i \, \phi_k(x^{(i)}) \phi_k(x^{(j)}) \, z_j
+$$
+
+$$
+= \sum_k \left( \sum_i z_i \, \phi_k(x^{(i)}) \right) \left( \sum_j \phi_k(x^{(j)}) \, z_j \right)
+$$
+
+$$
+= \sum_k \left( \sum_i z_i \, \phi_k(x^{(i)}) \right)^2
+$$
+
+$$
+\geq 0
+$$
+</Derivation>

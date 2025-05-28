@@ -1,0 +1,534 @@
+<center>
+# Generative Learning Algorithms
+</center>
+
+## Gaussian Discriminant Analysis
+
+If we want to classify between cats and dogs, discrimnative learning algorithms try to learn a hyperplane that separates the two classes directly. Generative learning algorithms, try to learn a model for what cats look like and a separate model to learn what dogs look like.
+
+After modelling $p(x \mid y)$ for each class and the class prior $p(y)$, we can classify a new example by computing the posterior $p(y \mid x)$ for each class and picking the class with the highest posterior probability.
+
+$$
+\arg \max_y p(y \mid x) = \arg \max_y \, \frac{p(x \mid y) p(y)}{p(x)}
+$$
+
+$$
+= \arg \max_y \, p(x \mid y) \, p(y)
+$$
+
+In Gaussian Discriminant Analysis (GDA), we assume that each of $p(x \mid y)$ follows a multivariate gaussian distribution with unique mean but a shared covariance matrix.
+
+$$
+p(y) = \phi^y (1 - \phi)^{1 - y}
+$$
+
+$$
+p(x \mid y = 0) = \frac{1}{(2 \pi)^{d/2} |\Sigma|^{1/2}} \exp \left( -\frac{1}{2} (x - \mu_0)^T \Sigma^{-1} (x - \mu_0) \right)
+$$
+
+$$
+p(x \mid y = 1) = \frac{1}{(2 \pi)^{d/2} |\Sigma|^{1/2}} \exp \left( -\frac{1}{2} (x - \mu_1)^T \Sigma^{-1} (x - \mu_1) \right)
+$$
+
+The log-likelihood of the data is then given by:
+
+$$
+\ell(\phi, \mu_0, \mu_1, \Sigma) = \log \prod_{i=1}^n \, p\left(x^{(i)}, y^{(i)}; \phi, \mu_0, \mu_1, \Sigma\right)
+$$
+
+By maximizing $\ell$ with respect to the parameters, we find the maximum likelihood estimate of the parameters to be:
+
+$$
+\phi = \frac{1}{n} \sum_{i=1}^n 1\left\{y^{(i)} = 1\right\}
+$$
+
+$$
+\mu_0 = \frac{\sum_{i=1}^n 1\left\{y^{(i)} = 0\right\} x^{(i)}}{\sum_{i=1}^n 1\left\{y^{(i)} = 0\right\}}
+$$
+
+$$
+\mu_1 = \frac{\sum_{i=1}^n 1\left\{y^{(i)} = 1\right\} x^{(i)}}{\sum_{i=1}^n 1\left\{y^{(i)} = 1\right\}}
+$$
+
+$$
+\Sigma = \frac{1}{n} \sum_{i=1}^n \left(x^{(i)} - \mu_{y^{(i)}}\right) \left(x^{(i)} - \mu_{y^{(i)}}\right)^T
+$$
+
+<Derivation className="mt-3 mb-0">
+$$
+\ell(\phi, \mu_0, \mu_1, \Sigma) = \log \, \prod_{i=1}^n \, p (x^{(i)}, y^{(i)}; \phi, \mu_0, \mu_1, \Sigma)
+$$
+
+<Info>
+$$
+= \log \, \prod_{i=1}^n p(x^{(i)} \mid y^{(i)}; \mu_{y^{(i)}}, \Sigma) \cdot p(y^{(i)}; \phi)
+$$
+
+We don't need to divide by $p(x^{(i)})$ because it is constant with respect to the parameters.
+</Info>
+
+$$
+= \sum_{i=1}^n \left[{y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) + \, (1-y^{(i)}) \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right) \right.
+$$
+
+$$
+\left. + \, \log \, {y^{(i)}} \cdot p\left(y^{(i)} = 1; \phi\right) + \, \log \, (1 - y^{(i)}) \cdot p\left(y^{(i)} = 0; \phi\right) \right]
+$$
+
+Now taking the derivative with respect to $\phi$, we get:
+
+<Info>
+$$
+\nabla_{\phi} \, \sum_{i=1}^n \left( y^{(i)} \log \phi + (1 - y^{(i)}) \log (1 - \phi) \right)
+$$
+
+Ignoring terms that are constant with respect to $\phi$.
+</Info>
+
+$$
+= \sum_{i=1}^n \left( \frac{y^{(i)}}{\phi} - \frac{1 - y^{(i)}}{1 - \phi} \right)
+$$
+
+$$
+= \sum_{i=1}^n \left( \frac{y^{(i)}}{\phi (1 - \phi)} - \frac{1}{1 - \phi} \right)
+$$
+
+Setting this equal to 0, we get:
+
+$$
+\sum_{i=1}^n \left( \frac{y^{(i)}}{\phi (1 - \phi)} - \frac{1}{1 - \phi} \right) = 0
+$$
+
+$$
+\Rightarrow \sum_{i=1}^n \left(\frac{y^{(i)}}{\phi (1 - \phi)}\right) = \frac{n}{1 - \phi}
+$$
+
+$$
+\Rightarrow \frac{1}{n} \sum_{i=1}^n y^{(i)} = \phi
+$$
+
+<Info>
+$$
+\Rightarrow \phi = \frac{1}{n} \sum_{i=1}^n 1\left\{y^{(i)} = 1\right\}
+$$
+
+Since $y^{(i)}$ is either 0 or 1
+</Info>
+</Derivation>
+
+<Derivation className="mt-0 mb-0">
+$$
+\sum_{i=1}^n \left[{y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) + \, (1-y^{(i)}) \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right) \right.
+$$
+
+$$
+\left. + \, \log \, {y^{(i)}} \cdot p\left(y^{(i)} = 1; \phi\right) + \, \log \, (1 - y^{(i)}) \cdot p\left(y^{(i)} = 0; \phi\right) \right]
+$$
+
+Now taking the derivative with respect to $\mu_0$, we get:
+
+<Info>
+$$
+\nabla_{\mu_0} \, \sum_{i=1}^n \left(1 - y^{(i)}\right) \log p\left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right)
+$$
+
+Ignoring terms that are constant with respect to $\phi$.
+</Info>
+
+$$
+= \nabla_{\mu_0} \sum_{i=1}^n \left(1 - y^{(i)}\right) \left( -\frac{1}{2} (x^{(i)} - \mu_0)^T \Sigma^{-1} (x^{(i)} - \mu_0)  \right)
+$$
+
+$$
+= \sum_{i=1}^n \left(1 - y^{(i)}\right) \left( \nabla_{\mu_0} \left[-\frac{1}{2} (x^{(i)} - \mu_0)^T \Sigma^{-1} (x^{(i)} - \mu_0) \right] \right)
+$$
+
+$$
+= \sum_{i=1}^n \left(1 - y^{(i)}\right) \left( \nabla_{\mu_0} \left[-\frac{1}{2} \left( x^{(i) T}\Sigma^{-1} x^{(i)} - \mu_0^T \Sigma^{-1} x^{(i)} - x^{(i) T}\Sigma^{-1} \mu_0 + \mu_0^T \Sigma^{-1} \mu_0 \right) \right] \right)
+$$
+
+<Info>
+$$
+= \sum_{i=1}^n \left(1 - y^{(i)}\right) \left[-\frac{1}{2} \left( - \Sigma^{-1} x^{(i)} - \Sigma^{-T} x^{(i)} + 2 \left(\Sigma^{-1} \mu_0 \right) \right) \right]
+$$
+
+$\Sigma^{-1}$ is a symmetric matrix.
+For any symmetric matrix $A$, $\nabla_{x} \left(x^T A x \right) = 2Ax$
+</Info>
+
+<Info>
+$$
+= \sum_{i=1}^n \left(1 - y^{(i)}\right) \left[-\frac{1}{2} \left( - \Sigma^{-1} x^{(i)} - \Sigma^{-1} x^{(i)} + 2 \left(\Sigma^{-1} \mu_0 \right) \right) \right]
+$$
+
+For symmetric matrices $(A^{-1})^T = A^{-1}$
+</Info>
+
+$$
+= \sum_{i=1}^{n} \left(1 - y^{(i)}\right) \left( \Sigma^{-1} x^{(i)} - \Sigma^{-1} \mu_0 \right)
+$$
+
+Setting this equal to $0$ and simplifying, we get:
+
+$$
+\sum_{i=1}^n \left[ \left(1 - y^{(i)}\right) \Sigma^{-1} x^{(i)} \right] = \sum_{i=1}^n \left[ \left(1 - y^{(i)}\right) \Sigma^{-1} \mu_0 \right]
+$$
+
+<Info>
+$$
+\Rightarrow \sum_{i=1}^n \left[ \Sigma^{-1} \left(1 - y^{(i)}\right) x^{(i)} \right] = \sum_{i=1}^n \left[\Sigma^{-1} \left(1 - y^{(i)}\right) \mu_0 \right]
+$$
+
+Since $y^{(i)}$ is just a scalar
+</Info>
+
+<Info>
+$$
+\Rightarrow \Sigma^{-1} \left[\sum_{i=1}^n \left(1 - y^{(i)}\right) x^{(i)} \right] = \Sigma^{-1} \left[ \sum_{i=1}^n \left(1 - y^{(i)}\right)\right] \mu_0
+$$
+
+Since $\Sigma_l^{-1}$ and $\mu_l^{-1}$ do not depend on $i$
+</Info>
+
+$$
+\Rightarrow \left[\sum_{i=1}^n \left(1 - y^{(i)}\right) x^{(i)} \right] = \left[ \sum_{i=1}^n \left(1 - y^{(i)}\right)\right] \mu_0
+$$
+
+$$
+\Rightarrow \mu_0 = \frac{\sum_{i=1}^n \left(1 - y^{(i)}\right) x^{(i)}}{\sum_{i=1}^n \left(1 - y^{(i)}\right)}
+$$
+
+$$
+\Rightarrow \mu_0 = \frac{\sum_{i=1}^n 1\left\{y^{(i)} = 0\right\} \, x^{(i)}}{\sum_{i=1}^n 1\left\{y^{(i)} = 0\right\}}
+$$
+
+Similarly, taking the derivative with respect to $\mu_1$ and setting it equal to 0, we get:
+
+$$
+\mu_1 = \frac{\sum_{i=1}^n 1\left\{y^{(i)} = 1\right\} \, x^{(i)}}{\sum_{i=1}^n 1\left\{y^{(i)} = 1\right\}}
+$$
+</Derivation>
+
+<Derivation className="mt-0 mb-3">
+$$
+\sum_{i=1}^n \left[{y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) + \, (1-y^{(i)}) \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right) \right.
+$$
+
+$$
+\left. + \, \log \, {y^{(i)}} \cdot p\left(y^{(i)} = 1; \phi\right) + \, \log \, (1 - y^{(i)}) \cdot p\left(y^{(i)} = 0; \phi\right) \right]
+$$
+
+Now taking the derivative with respect to $\Sigma$, we get:
+
+$$
+\nabla_{\Sigma} \, \sum_{i=1}^n \left[ {y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) +  \left(1-y^{(i)}\right) \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right) \right]
+$$
+
+Finding the derivative of the first term:
+
+$$
+\nabla_{\Sigma} \, \sum_{i=1}^n \left({y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) \right)
+$$
+
+$$
+= \nabla_{\Sigma} \left(\sum_{i=1}^n y^{(i)} \left[\log \frac{1}{(2\pi)^{d/2} |\Sigma|^{1/2}} -\frac{1}{2} \left(x^{(i)} - \mu_1\right)^T \Sigma^{-1} \left(x^{(i)} - \mu_1\right) \right] \right)
+$$
+
+$$
+= \nabla_{\Sigma} \left(\sum_{i=1}^n  y^{(i)} \left[-\log \, (2\pi)^{d/2}  -\log \, |\Sigma|^{1/2}  -\frac{1}{2} \left(x^{(i)} - \mu_1\right)^T \Sigma^{-1} \left(x^{(i)} - \mu_1\right) \right] \right)
+$$
+
+$$
+= \sum_{i=1}^n y^{(i)} \left(\nabla_{\Sigma} \left[-\log \, |\Sigma|^{1/2} \right]  -\frac{1}{2} \nabla_{\Sigma} \left[ \left(x^{(i)} - \mu_1 \right)^T \Sigma^{-1} \left(x^{(i)} - \mu_1 \right) \right] \right)
+$$
+
+<Lemma>
+We won't prove this here, but there are two Lemmas we need here:
+
+$$
+\text{1. } \nabla_A | A | = |A|(A^{-1})^T
+$$
+
+$$
+\text{2. } \nabla_A \left(x^T A^{-1} x \right) = -A^{-1} x x^T A^{-1}
+$$
+</Lemma>
+
+We are going to find the two derivates separately,
+
+$$
+\nabla_{\Sigma} \left[\log |\Sigma|^{1/2} \right]
+$$
+
+$$
+= \left(\frac{1}{|\Sigma|^{1/2}} \right) \nabla_{\Sigma} \left[|\Sigma|^{1/2} \right]
+$$
+
+$$
+= \left(\frac{1}{|\Sigma|^{1/2}} \right) \left( \frac{1}{2} |\Sigma|^{-1/2} \right) \nabla_{\Sigma} |\Sigma|
+$$
+
+<Info>
+$$
+= \frac{1}{2} \left(\frac{1}{|\Sigma_l|} |\Sigma_l| \right) \Sigma_l^{-1}
+$$
+
+Using Lemma 1 and the fact that for symmetric matrices $(A^{-1})^T = A^{-1}$
+</Info>
+
+$$
+= \frac{1}{2} \Sigma_l^{-1}
+$$
+
+$$
+\nabla_{\Sigma_l} \left[ \left(x^{(i)} - \mu_l \right)^T \Sigma_j^{-1} \left(x^{(i)} - \mu_l \right) \right]
+$$
+
+$$
+= -\Sigma_l^{-1} \left(x^{(i)} - \mu_l \right) \left(x^{(i)} - \mu_l \right)^T \Sigma_l^{-1}
+$$
+
+Thus,
+
+$$
+\nabla_{\Sigma} \, \sum_{i=1}^n \left({y^{(i)}} \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 1; \mu_1, \Sigma \right) \right)
+$$
+
+$$
+= \sum_{i=1}^n y^{(i)} \left(- \frac{1}{2} \left[\Sigma^{-1} \right] -\frac{1}{2} \left[ -\Sigma^{-1} \left(x^{(i)} - \mu_1 \right) \left(x^{(i)} - \mu_1 \right)^T \Sigma^{-1} \right] \right)
+$$
+
+$$
+= \sum_{i=1}^n y^{(i)} \left[ \frac{1}{2} \left(- \Sigma^{-1} + \Sigma^{-1} \left(x^{(i)} - \mu_1 \right) \left(x^{(i)} - \mu_1 \right)^T \Sigma^{-1} \right) \right]
+$$
+
+Similarly, we can find the derivative of the second term:
+
+$$
+\nabla_{\Sigma} \, \sum_{i=1}^n \left(\left(1 - {y^{(i)}}\right) \cdot \log \, p \left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right) \right)
+$$
+
+$$
+= \sum_{i=1}^n \left(1 - {y^{(i)}}\right) \left[ \frac{1}{2} \left(- \Sigma^{-1} + \Sigma^{-1} \left(x^{(i)} - \mu_0 \right) \left(x^{(i)} - \mu_0 \right)^T \Sigma^{-1} \right) \right]
+$$
+
+Putting them together, we get:
+
+$$
+= \frac{1}{2} \, \sum_{i=1}^n \left[ y^{(i)} \left(- \Sigma^{-1} + \Sigma^{-1} \left(x^{(i)} - \mu_1 \right) \left(x^{(i)} - \mu_1 \right)^T \Sigma^{-1} \right) \right.
+$$
+
+$$
+\left. +  \left(1 - {y^{(i)}}\right) \left(- \Sigma^{-1} + \Sigma^{-1} \left(x^{(i)} - \mu_0 \right) \left(x^{(i)} - \mu_0 \right)^T \Sigma^{-1} \right) \right]
+$$
+
+$$
+= \frac{1}{2} \, \sum_{i=1}^n \left[ - y^{(i)} \Sigma^{-1} - \Sigma^{-1} + y^{(i)} \Sigma^{-1} + y^{(i)} \left(\Sigma^{-1} \left(x^{(i)} - \mu_1 \right) \left(x^{(i)} - \mu_1 \right)^T \Sigma^{-1} \right) \right.
+$$
+
+$$
+\left. +  \left(1 - {y^{(i)}}\right) \left( \Sigma^{-1} \left(x^{(i)} - \mu_0 \right) \left(x^{(i)} - \mu_0 \right)^T \Sigma^{-1} \right) \right]
+$$
+
+$$
+= \frac{1}{2} \, \sum_{i=1}^n \left[- \Sigma^{-1} + \Sigma^{-1} \left(x^{(i)} - \mu_{y^{(i)}} \right) \left(x^{(i)} - \mu_{y^{(i)}} \right)^T \Sigma^{-1} \right]
+$$
+
+Setting this equal to 0 and simplifying, we get:
+
+$$
+\Sigma^{-1} = \frac{1}{n} \, \sum_{i=1}^n \left[\Sigma^{-1} \left(x^{(i)} - \mu_{y^{(i)}} \right) \left(x^{(i)} - \mu_{y^{(i)}} \right)^T \Sigma^{-1} \right]
+$$
+
+$$
+\Rightarrow \Sigma^{-1} = \Sigma^{-1} \left(\frac{1}{n} \, \sum_{i=1}^n \left(x^{(i)} - \mu_{y^{(i)}} \right) \left(x^{(i)} - \mu_{y^{(i)}} \right)^T \right) \Sigma^{-1}
+$$
+
+$$
+\Rightarrow \Sigma = \frac{1}{n} \, \sum_{i=1}^n \left(x^{(i)} - \mu_{y^{(i)}} \right) \left(x^{(i)} - \mu_{y^{(i)}} \right)^T
+$$
+</Derivation>
+
+<Margin />
+
+# Naive Bayes
+
+When our feacture vectors $x$ take on discrete values, we can use the Naive Bayes.
+
+$$
+x \in \{0, 1\}^d
+$$
+
+We also make the assumption that $x_i$'s are conditionally independent given $y$.
+
+$$
+p(x_1, \ldots, x_d | y) = \prod_{j=1}^d p(x_j | y)
+$$
+
+We also assume that $y$ takes on two values, $0$ and $1$. Our likelihood function then becomes:
+
+$$
+\ell(\phi_y, \phi_{j \mid y = 0}, \phi_{j \mid y = 1}) = \log \, \prod_{i=1}^n \, p \left( x^{(i)}, y^{(i)} ; \phi_y, \phi_{j \mid y = 0}, \phi_{j \mid y = 1} \right)
+$$
+
+$$
+= \log \, \prod_{i=1}^n \, \left( \prod_{j=1}^d p\left(x_j^{(i)} \mid y^{(i)} ; \phi_{j \mid y = 0}, \phi_{j \mid y = 1}\right) \right) p\left(y^{(i)} ; \phi_y\right)
+$$
+
+Maximizing our log likelihood function with respect to our parameters, we get:
+
+$$
+\phi_{j \mid y = 1} = \frac{\sum_{i=1}^{n} 1\left\{x_j^{(i)} = 1 \land y^{(i)} = 1\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}}
+$$
+
+$$
+\phi_{j \mid y = 0} = \frac{\sum_{i=1}^{n} 1\left\{x_j^{(i)} = 1 \land y^{(i)} = 0\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 0\right\}}
+$$
+
+$$
+\phi_{y} = \frac{1}{n} \, \sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}
+$$
+
+<Derivation className="mt-3 mb-0">
+$$
+\ell(\phi_y, \phi_{j \mid y = 0}, \phi_{j \mid y = 1}) = \log \, \prod_{i=1}^n \, \left( \prod_{j=1}^d p\left(x_j^{(i)} \mid y^{(i)} ; \phi_{j \mid y = 0}, \phi_{j \mid y = 1}\right) \right) p\left(y^{(i)} ; \phi_y\right)
+$$
+
+$$
+= \sum_{i=1}^n \, \left( \sum_{j=1}^d \left( \log \left(\phi_{j \mid y = 1} \right)^{x_j^{(i)} y^{(i)}} + \log \left(1 - \phi_{j \mid y = 1} \right)^{\left(1 - x_j^{(i)} \right) y^{(i)}} + \log \left(\phi_{j \mid y = 0}\right)^{x_j^{(i)} \left(1 - y^{(i)} \right)} + \log \left(\phi_{j \mid y = 0}\right)^{\left(1 - x_j^{(i)} \right) \left(1 - y^{(i)} \right)}  \right) \right.
+$$
+
+$$
+\left. + \, \log \left(\phi_y\right)^{y^{(i)}} + \log \left(1 - \phi_y\right)^{\left(1 - y^{(i)} \right)} \right)
+$$
+
+Taking the derivative of our log likelihood function with respect to $\phi_y$, we get:
+
+<Info>
+$$
+\nabla_{\phi_y} \, \sum_{i=1}^n \left( y^{(i)} \log \phi_y + (1 - y^{(i)}) \log (1 - \phi_y) \right)
+$$
+
+Ignoring terms that are constant with respect to $\phi_y$.
+</Info>
+
+$$
+= \sum_{i=1}^n \left( \frac{y^{(i)}}{\phi_y} - \frac{1 - y^{(i)}}{1 - \phi_y} \right)
+$$
+
+$$
+= \sum_{i=1}^n \left( \frac{y^{(i)}}{\phi_y (1 - \phi_y)} - \frac{1}{1 - \phi_y} \right)
+$$
+
+Setting this equal to 0, we get:
+
+$$
+\sum_{i=1}^n \left( \frac{y^{(i)}}{\phi_y (1 - \phi_y)} - \frac{1}{1 - \phi_y} \right) = 0
+$$
+
+$$
+\Rightarrow \sum_{i=1}^n \left(\frac{y^{(i)}}{\phi_y (1 - \phi_y)}\right) = \frac{n}{1 - \phi_y}
+$$
+
+$$
+\Rightarrow \frac{1}{n} \sum_{i=1}^n y^{(i)} = \phi_y
+$$
+
+<Info>
+$$
+\Rightarrow \phi_y = \frac{1}{n} \sum_{i=1}^n 1\left\{y^{(i)} = 1\right\}
+$$
+
+Since $y^{(i)}$ is either 0 or 1
+</Info>
+</Derivation>
+
+<Derivation className="mt-0 mb-3">
+$$
+\sum_{i=1}^n \, \left( \sum_{j=1}^d \left( \log \left(\phi_{j \mid y = 1} \right)^{x_j^{(i)} y^{(i)}} + \log \left(1 - \phi_{j \mid y = 1} \right)^{\left(1 - x_j^{(i)} \right) y^{(i)}} + \log \left(\phi_{j \mid y = 0}\right)^{x_j^{(i)} \left(1 - y^{(i)} \right)} + \log \left(\phi_{j \mid y = 0}\right)^{\left(1 - x_j^{(i)} \right) \left(1 - y^{(i)} \right)}  \right) \right.
+$$
+
+$$
+\left. + \, \log \left(\phi_y\right)^{y^{(i)}} + \log \left(1 - \phi_y\right)^{\left(1 - y^{(i)} \right)} \right)
+$$
+
+Taking the derivative with respect to $\phi_{k \mid y = 1}$, we get:
+
+<Info>
+$$
+\nabla_{\phi_{k \mid y = 1}} \, \sum_{i=1}^n \sum_{j=1}^d \left( x_j^{(i)} y^{(i)} \log \phi_{k \mid y = 1} + \left(1 - x_j^{(i)} \right) y^{(i)} \log \left(1 - \phi_{k \mid y = 1} \right) \right)
+$$
+
+Ignoring terms that are constant with respect to $\phi_{k \mid y = 1}$.
+</Info>
+
+$$
+= \sum_{i=1}^n \left( x_k^{(i)} y^{(i)} \cdot \frac{1}{\phi_{k \mid y = 1}} - \left(1 - x_k^{(i)} \right) y^{(i)} \cdot \frac{1}{ \left(1 - \phi_{k \mid y = 1} \right)} \right)
+$$
+
+$$
+= \sum_{i=1}^n \left(y^{(i)} \cdot \frac{x_k^{(i)} - x_k^{(i)}\phi_{k \mid y = 1} - \phi_{k \mid y = 1} + x_k^{(i)}\phi_{k \mid y = 1} }{\phi_{k \mid y = 1} \left(1 - \phi_{k \mid y = 1} \right)} \right)
+$$
+
+$$
+= \sum_{i=1}^n \left(y^{(i)} \cdot \frac{x_k^{(i)}  - \phi_{k \mid y = 1}  }{\phi_{k \mid y = 1} \left(1 - \phi_{k \mid y = 1} \right)} \right)
+$$
+
+Setting this equal to 0, we get:
+
+$$
+\sum_{i=1}^n y^{(i)} x_k^{(i)} = \sum_{i=1}^n y^{(i)} \phi_{k \mid y = 1}
+$$
+
+$$
+\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^n y^{(i)} x_k^{(i)}}{\sum_{i=1}^n y^{(i)}}
+$$
+
+<Info>
+$$
+\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^{n} 1\left\{x_k^{(i)} = 1 \land y^{(i)} = 1\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}}
+$$
+
+Since both $x_k^{(i)}$ and $y^{(i)}$ are either $0$ or $1$.
+</Info>
+
+Similarly, taking the derivative with respect to $\phi_{k \mid y = 0}$, we get:
+
+$$
+\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^n \left(1 - y^{(i)} \right) x_k^{(i)}}{\sum_{i=1}^n \left(1 - y^{(i)} \right)}
+$$
+
+<Info>
+$$
+\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^{n} 1\left\{x_k^{(i)} = 1 \land y^{(i)} = 0\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 0\right\}}
+$$
+
+Since both $x_k^{(i)}$ and $y^{(i)}$ are either $0$ or $1$.
+</Info>
+</Derivation>
+
+Having fit all these parameters, to make a prediction on a new example, we simply calculate:
+
+$$
+p(y = 1|x) = \frac{p(x|y = 1)p(y = 1)}{p(x)}
+$$
+
+$$
+p(y = 1|x) = \frac{\left( \prod_{j=1}^{d} p(x_j|y = 1) \right) p(y = 1)}{\left( \prod_{j=1}^{d} p(x_j|y = 1) \right) p(y = 1) + \left( \prod_{j=1}^{d} p(x_j|y = 0) \right) p(y = 0)}
+$$
+
+However, there is a problem with this approach. If any of the $p(x_j|y = 1)$, then our prediction will be 0. This happens if we don't have any training example for which a particular $x_j$ is $1$.
+
+As a work around, we apply Laplace smoothing. Our parameters then become:
+
+$$
+\phi_{j \mid y = 1} = \frac{1 + \sum_{i=1}^{n} 1\left\{x_j^{(i)} = 1 \land y^{(i)} = 1\right\}}{2 + \sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}}
+$$
+
+$$
+\phi_{j \mid y = 0} = \frac{1 + \sum_{i=1}^{n} 1\left\{x_j^{(i)} = 1 \land y^{(i)} = 0\right\}}{2 + \sum_{i=1}^{n} 1\left\{y^{(i)} = 0\right\}}
+$$
+
+$$
+\phi_y = \frac{1}{n} \, \sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}
+$$

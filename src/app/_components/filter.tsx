@@ -36,7 +36,7 @@ export default function Filter({ label, options, onChange }: FilterProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="h-12 w-full lg:w-[450px] flex flex-row gap-1 justify-between items-center bg-white rounded-lg border cursor-pointer">
+        <div className="h-12 w-full lg:w-[400px] flex flex-row gap-1 justify-between items-center bg-white rounded-lg border cursor-pointer">
           <div className="flex flex-row gap-1.5 items-center pl-4 pr-6 py-2">
             <Add className="stroke-textDarkGray" size={20} />
             <div className="text-textDarkGray font-normal text-sm whitespace-nowrap">{label}</div>
@@ -48,7 +48,7 @@ export default function Filter({ label, options, onChange }: FilterProps) {
                 <div className="flex flex-row gap-2 items-center pl-2 pr-3 overflow-hidden">
                   {selected.map((option) => (
                     <Badge variant="outline" key={option.label} className="truncate max-w-36">
-                      {truncateText(option.label, 15)}
+                      {truncateText(option.label, 10)}
                     </Badge>
                   ))}
                 </div>

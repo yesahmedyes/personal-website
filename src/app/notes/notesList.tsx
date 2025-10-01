@@ -5,8 +5,16 @@ const notes_data = [
   {
     title: "Machine Learning",
     description: "Supervised Learning, Unsupervised Learning, Learning Theory, etc.",
-    image: "/images/machine-learning.png",
+    image: "/images/ml.png",
+    style: "opacity-95",
     href: "/notes/machine-learning",
+  },
+  {
+    title: "Reinforcement Learning",
+    description: "Q-Learning, Policy Gradients, Model-Free vs Model-Based, etc.",
+    image: "/images/rl.png",
+    style: "",
+    href: "/notes/reinforcement-learning",
   },
 ];
 
@@ -18,7 +26,7 @@ export default function NotesList() {
           <div className="flex flex-col group w-full rounded-lg border border-black/10 hover:border-black/20 px-4 py-6">
             <div className="group-hover:text-orange-500 text-center text-textBlack font-semibold">{item.title}</div>
             <div className="flex flex-col rounded h-[250px] place-items-center justify-center">
-              <Image src={item.image} alt="Notes" width={250} height={300} />
+              <Image src={item.image} alt="Notes" width={250} height={300} className={item.style} />
             </div>
             <div className="whitespace-normal text-sm leading-7 text-textBlack text-center">{item.description}</div>
           </div>

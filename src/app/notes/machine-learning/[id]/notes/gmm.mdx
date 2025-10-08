@@ -404,93 +404,47 @@ Since $w_l^{(i)}$ is a scalar.
 </Info>
 </Derivation>
 
-{/* <Algorithm> */}
+<Algorithm>
 $$
 \text{Repeat until convergence \{}
 $$
 
 $$
-\hspace{2em} \text{(E-step) For each } i \text{ and } j, \text{ set } \text{\{}
+\quad \text{(E-step) For each } i \text{ and } j, \text{ set } \text{\{}
 $$
 
 $$
-\hspace{4em} w_j^{(i)} \leftarrow p(z^{(i)} = j \mid x^{(i)}; \phi, \mu, \Sigma).
+\quad \quad w_j^{(i)} \leftarrow p(z^{(i)} = j \mid x^{(i)}; \phi, \mu, \Sigma).
 $$
 
 $$
-\hspace{2em} \text{\}}
+\quad \text{\}}
 $$
 
 $$
-\hspace{2em} \text{(M-step) For each } j, \text{ set } \text{\{}
+\quad \text{(M-step) For each } j, \text{ set } \text{\{}
 $$
 
 $$
-\hspace{4em} \phi_j \leftarrow \frac{1}{n} \sum_{i=1}^n w_j^{(i)} 
+\quad \quad \phi_j \leftarrow \frac{1}{n} \sum_{i=1}^n w_j^{(i)}
 $$
 
 $$
-\hspace{4em} \mu_j \leftarrow \frac{\sum_{i=1}^n w_j^{(i)} x^{(i)}}{\sum_{i=1}^n w_j^{(i)}} 
+\quad \quad \mu_j \leftarrow \frac{\sum_{i=1}^n w_j^{(i)} x^{(i)}}{\sum_{i=1}^n w_j^{(i)}}
 $$
 
 $$
-\hspace{4em} \Sigma_j \leftarrow \frac{\sum_{i=1}^n w_j^{(i)} (x^{(i)} - \mu_j)(x^{(i)} - \mu_j)^T}{\sum_{i=1}^n w_j^{(i)}} 
+\quad \quad \Sigma_j \leftarrow \frac{\sum_{i=1}^n w_j^{(i)} (x^{(i)} - \mu_j)(x^{(i)} - \mu_j)^T}{\sum_{i=1}^n w_j^{(i)}}
 $$
 
 $$
-\hspace{2em} \text{\}}
+\quad \text{\}}
 $$
 
 $$
 \text{\}}
 $$
-{/* </Algorithm> */}
-
-```python
-def e_step_gmm(X, phi, mu, sigma):
-    """E-step: Compute w_j^(i) = p(z^(i) = j | x^(i); φ, μ, Σ)"""
-    w = []
-    for i in range(len(X)):
-        w_i = compute_responsibilities(X[i], phi, mu, sigma)  # p(z^(i) = j | x^(i); φ, μ, Σ)
-        w.append(w_i)
-    return w
-
-def m_step_gmm(X, w):
-    """M-step: Update φ, μ, Σ using responsibilities"""
-    n = len(X)
-    k = len(w[0])  # number of components
-    
-    # Update mixing coefficients: φ_j ← (1/n) Σ w_j^(i)
-    phi_new = []
-    for j in range(k):
-        phi_j = (1/n) * sum(w[i][j] for i in range(n))
-        phi_new.append(phi_j)
-    
-    # Update means: μ_j ← Σ w_j^(i) x^(i) / Σ w_j^(i)
-    mu_new = []
-    for j in range(k):
-        numerator = sum(w[i][j] * X[i] for i in range(n))
-        denominator = sum(w[i][j] for i in range(n))
-        mu_j = numerator / denominator
-        mu_new.append(mu_j)
-    
-    # Update covariances: Σ_j ← Σ w_j^(i) (x^(i) - μ_j)(x^(i) - μ_j)^T / Σ w_j^(i)
-    sigma_new = []
-    for j in range(k):
-        numerator = sum(w[i][j] * outer_product(X[i] - mu_new[j], X[i] - mu_new[j]) for i in range(n))
-        denominator = sum(w[i][j] for i in range(n))
-        sigma_j = numerator / denominator
-        sigma_new.append(sigma_j)
-    
-    return phi_new, mu_new, sigma_new
-
-for iteration in range(100):
-    # E-step: For each i and j, set w_j^(i) ← p(z^(i) = j | x^(i); φ, μ, Σ)
-    w = e_step_gmm(X, phi, mu, sigma)
-    
-    # M-step: Update φ, μ, Σ using current responsibilities
-    phi, mu, sigma = m_step_gmm(X, w)
-```
+</Algorithm>
 
 In the $E$ step, we estimate the probability of each $z^{(i)}$ given $x^{(i)}$ using the current parameters $\phi, \mu, \Sigma$.
 

@@ -4,20 +4,43 @@
 
 For a given dataset $x^{(1)}, \ldots, x^{(n)}$ without any labels $y^{(i)}$, clustering is the task of finding a partition of the data into subsets (clusters) such that the data points in the same cluster are more similar to each other than to those in other clusters. For this purpose, we usually use the k-means algorithm.
 
-```python
-n, d = X.shape
+<Algorithm>
+$$
+\text{Initialize cluster centroids } \mu_1, \ldots, \mu_k \text{ randomly}
+$$
 
-centroids = np.random.randn(k, d)
+$$
+\text{Repeat until convergence \{}
+$$
 
-for _ in range(max_iters):
-    distances = np.zeros(n, dtype=int)
+$$
+\quad \text{For each } i, \text{ set } \text{\{}
+$$
 
-    for i in range(n):
-        distances[i] = np.argmin(np.linalg.norm(X[i] - centroids, axis=1))
+$$
+\quad \quad c^{(i)} \leftarrow \arg \min_j \| x^{(i)} - \mu_j \|^2
+$$
 
-    for j in range(k):
-        centroids[j] = X[distances == j].mean(axis=0)
-```
+$$
+\quad \text{\}}
+$$
+
+$$
+\quad \text{For each } j, \text{ set } \text{\{}
+$$
+
+$$
+\quad \quad \mu_j \leftarrow \frac{\sum_{i=1}^n 1\left\{c^{(i)} = j\right\} \, x^{(i)}}{\sum_{i=1}^n 1\left\{c^{(i)} = j\right\}}
+$$
+
+$$
+\quad \text{\}}
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>
 
 The first loop gives us the centroid $c^{(i)}$ that is closest to each data point $x^{(i)}$. The second loop updates the centroid $\mu_j$ for each cluster $j$ as the mean of all data points $x^{(i)}$ assigned to that cluster.
 

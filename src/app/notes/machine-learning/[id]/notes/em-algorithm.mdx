@@ -176,27 +176,39 @@ $$
 \log p(x; \theta) \geq \text{ELBO}(x; Q, \theta)
 $$
 
-```python
-def e_step(X, theta):
-    """E-step: Compute Q_i(z^(i)) = p(z^(i) | x^(i); θ)"""
-    Q = []
-    for i in range(len(X)):
-        q_i = posterior_distribution(X[i], theta)  # p(z^(i) | x^(i); θ)
-        Q.append(q_i)
-    return Q
+<Algorithm>
+$$
+\text{Repeat until convergence \{}
+$$
 
-def m_step(X, Q):
-    """M-step: θ ← argmax_θ Σ ELBO(x^(i); Q_i, θ)"""
-    theta_new = maximize_elbo(X, Q)
-    return theta_new
+$$
+\quad \text{(E-step) For each } i, \text{ set } \text{\{}
+$$
 
-for iteration in range(100):
-    # E-step: For each i, set Q_i(z^(i)) ← p(z^(i) | x^(i); θ)
-    Q = e_step(X, theta)
-        
-    # M-step: Set θ ← argmax_θ Σ ELBO(x^(i); Q_i, θ)
-    theta = m_step(X, Q)
-```
+$$
+\quad \quad Q_i(z^{(i)}) \leftarrow p(z^{(i)} | x^{(i)}; \theta)
+$$
+
+$$
+\quad \text{\}}
+$$
+
+$$
+\quad \text{(M-step) Set } \text{\{}
+$$
+
+$$
+\quad \quad \theta \leftarrow \arg \max_{\theta} \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i, \theta)
+$$
+
+$$
+\quad \text{\}}
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>
 
 In the $E$ step we find the estimated distributions over $z^{(i)}$ using our current value of $\theta$ and thus our current estimated distribution over $x^{(i)}$ given $z^{(i)}$. We do so using the Bayes' rule:
 

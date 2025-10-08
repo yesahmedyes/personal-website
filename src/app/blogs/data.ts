@@ -5,13 +5,13 @@ export const blogs_data = [
     tags: ["language models", "diffusion models"],
   },
   {
-    title: "The Math Behind DeepSeek",
+    title: "Group Relative Policy Optimization",
     link: "",
-    tags: ["deepseek", "math"],
+    tags: ["reinforcement learning", "policy optimization"],
   },
   {
-    title: "Continual Learning - A Survey",
+    title: "Gaussian Splatting",
     link: "",
-    tags: ["continual learning"],
+    tags: ["gaussian splatting", "3d reconstruction"],
   },
 ];

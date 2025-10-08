@@ -5,6 +5,7 @@ import React from "react";
 import Info from "./info";
 import CodeBlock from "./codeBlock";
 import Detour from "./detour";
+import Algorithm from "./algorithm";
 
 interface MDXSectionProps {
   title?: string;
@@ -33,6 +34,7 @@ const components = {
   Detour,
   Info,
   Lemma,
+  Algorithm,
 };
 
 export default function MDXSection({ children }: MDXSectionProps) {

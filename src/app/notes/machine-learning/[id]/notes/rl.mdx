@@ -60,34 +60,69 @@ $$
 
 Finding the optimal policy is equivalent to finding the optimal value function. And there are two algorithms that can do this: **Value Iteration** and **Policy Iteration**.
 
-```python
-# Initialize value function
-V = {s: 0 for s in states}
+<Algorithm>
+$$
+\textbf{Value Iteration}
+$$
 
-# Iterate until convergence
-while not converged:
-    for s in states:
-        V[s] = R[s] + gamma * max([
-            sum(P[s][a][s_prime] * V[s_prime] for s_prime in states)
-            for a in actions
-        ])
-```
+$$
+\text{For each state } s, \text{ initialize } V(s) = 0
+$$
 
-```python
-# Initialize random policy
-pi = {s: random.choice(actions) for s in states}
+$$
+\text{Repeat until convergence \{}
+$$
 
-while not converged:
-    # Policy evaluation: solve V = V^π
-    V = solve_linear_system(pi)  # V^π
-    
-    # Policy improvement
-    for s in states:
-        pi[s] = argmax([
-            sum(P[s][a][s_prime] * V[s_prime] for s_prime in states)
-            for a in actions
-        ])
-```
+$$
+\quad \text{For each state } s, \text{ set } \text{\{}
+$$
+
+$$
+\quad \quad V(s) \leftarrow R(s) + \max_{a \in A} \left(\gamma \sum_{s' \in S} P_{sa}(s') V(s') \right)
+$$
+
+$$
+\quad \text{\}}
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>
+
+<Algorithm>
+$$
+\textbf{Policy Iteration}
+$$
+
+$$
+\text{Initialize } π \text{ randomly}
+$$
+
+$$
+\text{Repeat until convergence \{}
+$$
+
+$$
+\quad \text{Let } V = V^{\pi} \hspace{8em} \Rightarrow \textit{typically by a linear system solver}
+$$
+
+$$
+\quad \text{For each state } s, \text{ set } \text{\{}
+$$
+
+$$
+\quad \quad π(s) \leftarrow \arg\max_{a \in A} \left(\sum_{s' \in S} P_{sa}(s') V(s') \right)
+$$
+
+$$
+\quad \text{\}}
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>
 
 For small MDPs, Policy iteration converges faster. However, for large MDPs, solving for $V^{\pi}$ in each step of policy iteration involves solving a large system of linear equations, which is computationally expensive.
 
@@ -187,28 +222,52 @@ $$
 y^{(i)} = R(s^{(i)}) + \gamma \cdot \max_{a \in A} \left(\int_{s'} P_{sa}(s') V(s') \, ds' \right)
 $$
 
-```python
-def V(s, theta):
-    return theta.T @ phi(s)
+<Algorithm>
+$$
+\text{Randomly sample } n \text{ states}
+$$
 
-# Sample states and initialize parameters
-sampled_states = random.sample(state_space, n)
-theta = np.zeros(feature_dim)
+$$
+\text{Initialize } \theta \text{ to } 0
+$$
 
-while not converged:
-    y = []
+$$
+\text{Repeat until convergence \{}
+$$
 
-    for s in sampled_states:
-        q_values = []
+$$
+\hspace{2em} \text{For } i = 1 \text{ to } n \text{ \{}
+$$
 
-        for a in actions:
-            # Sample next states from transition model
-            next_states = [sample_from_P(s, a) for _ in range(k)]
-            q_a = R[s] + gamma * mean([V(s_prime, theta) for s_prime in next_states])
-            q_values.append(q_a)
+$$
+\hspace{4em} \text{For each action } a \in A \text{ \{}
+$$
 
-        y.append(max(q_values))
-    
-    # Update parameters via least squares
-    theta = argmin_theta(sum((y[i] - theta.T @ phi(sampled_states[i]))**2 for i in range(n)))
-```
+$$
+\hspace{6em} \text{Sample } s_1', s_2', \ldots, s_k' \sim P_{s^{(i)}a}(s')
+$$
+
+$$
+\hspace{6em} \text{Set } q(a) \leftarrow R(s^{(i)}) + \gamma \cdot \frac{1}{k} \cdot \sum_{j=1}^k V(s_j')
+$$
+
+$$
+\hspace{4em} \text{\}}
+$$
+
+$$
+\hspace{4em} y^{(i)} \leftarrow \max_{a} q(a)
+$$
+
+$$
+\hspace{2em} \text{\}}
+$$
+
+$$
+\hspace{2em} \theta \leftarrow \arg \min_{\theta} \sum_{i=1}^n \left(y^{(i)} - \theta^T \phi(s^{(i)})\right)^2
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>

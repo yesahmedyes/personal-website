@@ -260,41 +260,48 @@ $$
 
 We can use this observation to write a Generic Boosting algorithm.
 
-```python
-def create_updated_ensemble(current_H, alpha, new_h):
-    """Create new ensemble: H_new = H_old + alpha * h"""
-    return lambda x: current_H(x) + alpha * new_h(x)
+<Algorithm>
+$$
+\text{Repeat } \{
+$$
 
-# Initialize ensemble classifier
-H = lambda x: 0  # Start with zero function
-    
-for iteration in range(max_iterations):
-    # Compute gradients for each training example
-    gradients = []
-    for i in range(len(X)):
-        r_i = compute_gradient(loss_function, H(X[i]), y[i])
-        gradients.append(r_i)
-        
-    # Find the best weak learner that minimizes the gradient dot product
-    best_h = None
-    min_score = float('inf')
-        
-    for h in H_set:
-        score = 0
-        for i in range(len(X)):
-            score += gradients[i] * h(X[i])
-        
-        if score < min_score:
-            min_score = score
-            best_h = h
-        
-    if min_score < 0:
-        # Update ensemble classifier
-        H = create_updated_ensemble(H, alpha, best_h)
-    else:
-        # No improvement possible, stop boosting
-        break
-```
+$$
+\quad \text{For each } i, \text{ let }r^{(i)} \leftarrow \frac{\partial \ell}{\partial H(x^{(i)})}
+$$
+
+$$
+\quad h \leftarrow \arg \min_{h \in \mathcal{H}} \, \sum_{i=1}^n r^{(i)} h(x^{(i)})
+$$
+
+$$
+\quad \text{temp} \leftarrow \sum_{i=1}^n r^{(i)} h(x^{(i)})
+$$
+
+$$
+\quad \text{if } \left( \text{temp} < 0 \right) \text{ then } \{
+$$
+
+$$
+\quad \quad H \leftarrow H + \alpha \cdot h
+$$
+
+$$
+\quad \} \text{ else } \{
+$$
+
+$$
+\quad \quad \text{return } H
+$$
+
+$$
+\quad \}
+$$
+
+$$
+\text{\}}
+$$
+
+</Algorithm>
 
 <Margin />
 
@@ -610,53 +617,56 @@ $$
 
 Note that when $\epsilon = \frac{1}{2}$, that means that our weighted misclassification error is equal to $50\%$. This means that our new classifier $h_{t+1}$ is no better than random guessing. Therefore, we only want to add a new classifier to our current ensemble if $\epsilon < \frac{1}{2}$.
 
-```python
-def create_updated_ensemble(current_H, alpha, new_h):
-    """Create new ensemble: H_new = H_old + alpha * h"""
-    return lambda x: current_H(x) + alpha * new_h(x)
+<Algorithm>
+$$
+\text{For each } i, \text{ let }w^{(i)} \leftarrow \frac{1}{n}
+$$
 
-n = len(X)
+$$
+\text{Repeat } \{
+$$
 
-# Initialize weights uniformly
-weights = np.ones(n) / n
+$$
+\quad h \leftarrow \arg \min_{h \in \mathcal{H}} \, \sum_{i=1}^n 1\left\{y^{(i)} \neq h(x^{(i)}) \right\} \cdot w^{(i)}
+$$
 
-# Initialize ensemble classifier
-H = lambda x: 0  # Start with zero function
+$$
+\quad \epsilon \leftarrow \sum_{i=1}^n 1\left\{y^{(i)} \neq h(x^{(i)}) \right\} \cdot w^{(i)}
+$$
 
-for iteration in range(max_iterations):
-    # Find best weak learner that minimizes weighted classification error
-    best_h = None
-    min_error = float('inf')
-    
-    for h in H_set:
-        # Compute weighted misclassification error
-        error = 0
-        for i in range(n):
-            if y[i] != h(X[i]):  # Misclassification indicator
-                error += weights[i]
-        
-        if error < min_error:
-            min_error = error
-            best_h = h
-    
-    epsilon = min_error
-    
-    # Check stopping condition
-    if epsilon >= 0.5:
-        # Weak learner is no better than random guessing
-        break
-    
-    # Compute step size (alpha)
-    alpha = 0.5 * math.log((1 - epsilon) / epsilon)
-    
-    # Update ensemble using the helper function
-    H = create_updated_ensemble(H, alpha, best_h)
-    
-    # Update weights
-    normalization_factor = 2 * math.sqrt(epsilon * (1 - epsilon))
-    
-    for i in range(n):
-        # Update weight based on classification result
-        prediction = best_h(X[i])
-        weights[i] = weights[i] * math.exp(-alpha * y[i] * prediction) / normalization_factor
-```
+$$
+\quad \text{if } \left(\epsilon < 0.5 \right) \text{ then } \{
+$$
+
+$$
+\quad \quad \alpha \leftarrow \frac{1}{2} \ln\left(\frac{1 - \epsilon}{\epsilon}\right)
+$$
+
+$$
+\quad \quad H \leftarrow H + \alpha \cdot h
+$$
+
+$$
+\quad \quad \text{For each } i, \text{ let }w^{(i)} \leftarrow w^{(i)} \cdot \frac{e^{-\alpha y^{(i)} h_{t+1}(x^{(i)})}}{2 \sqrt{\epsilon(1 - \epsilon)}}
+$$
+
+$$
+\quad \}
+$$
+
+$$
+\quad \text{else } \{
+$$
+
+$$
+\quad \quad \text{return } H
+$$
+
+$$
+\quad \}
+$$
+
+$$
+\text{\}}
+$$
+</Algorithm>

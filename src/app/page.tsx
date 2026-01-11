@@ -13,7 +13,7 @@ export default function Main() {
           <div className="flex flex-col gap-5 lg:gap-4 text-textWhite text-lg px-6 lg:px-0 w-full lg:w-2/3">
             <p className="font-serif font-medium text-xl lg:text-2xl text-center lg:text-left">Hey, I&apos;m Ahmed.</p>
             <p className="font-sans font-light leading-relaxed text-center lg:text-justify pb-0 lg:pb-2">
-              An aspiring machine learning researcher with an interest in continual learning, reinforcement learning and large language models.
+              A machine learning researcher with an interest in computer vision, reinforcement learning and robotics.
             </p>
           </div>
         </div>

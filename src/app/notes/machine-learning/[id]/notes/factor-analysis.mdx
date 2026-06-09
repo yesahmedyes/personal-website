@@ -443,7 +443,7 @@ $$
 
 <Info>
 $$
-= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{\mu} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{\mu} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{\mu} \left(\left(x^{(i)} - \mu\right)^T \Psi^{-1} W z^{(i)} \right) \right]
+= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{W} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{W} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{W} \left(\left(x^{(i)} - \mu\right)^T \Psi^{-1} W z^{(i)} \right) \right]
 $$
 
 Ignoring terms that do not depend on $W$.
@@ -451,7 +451,7 @@ Ignoring terms that do not depend on $W$.
 
 <Info>
 $$
-= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{\mu} \text{ tr} \left(\left(x^{(i)} - \mu\right)^T \Psi^{-1} W z^{(i)} \right) \right]
+= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{W} \text{ tr} \left(\left(x^{(i)} - \mu\right)^T \Psi^{-1} W z^{(i)} \right) \right]
 $$
 
 All the three terms simplify to a scalar. And for a scalar $s$:
@@ -463,7 +463,7 @@ $$
 
 <Info>
 $$
-= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-T} \left(x^{(i)} - \mu\right) \right) \right]
+= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-\nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) - \nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-T} \left(x^{(i)} - \mu\right) \right) \right]
 $$
 
 $$
@@ -477,7 +477,7 @@ $$
 
 <Info>
 $$
-= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-2 \, \nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{\mu} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) \right]
+= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-2 \, \nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} \left(x^{(i)} - \mu \right)  \right) + \nabla_{W} \text{ tr} \left(z^{(i)T} W^T \Psi^{-1} W z^{(i)} \right) \right]
 $$
 
 $\Psi$ is a symmetric matrix, therefore
@@ -489,10 +489,10 @@ $$
 
 <Info>
 $$
-= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-2 \, \nabla_{\mu} \text{ tr} \left(W^T \Psi^{-1} \left(x^{(i)} - \mu \right) z^{(i)T} \right) + \nabla_{\mu} \text{ tr} \left(W z^{(i)} z^{(i)T} W^T \Psi^{-1} \right) \right]
+= -\frac{1}{2} \, \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[-2 \, \nabla_{W} \text{ tr} \left(W^T \Psi^{-1} \left(x^{(i)} - \mu \right) z^{(i)T} \right) + \nabla_{W} \text{ tr} \left(W z^{(i)} z^{(i)T} W^T \Psi^{-1} \right) \right]
 $$
 
-Traces are cyclicly permutable.
+Traces are cyclically permutable.
 
 $$
 \text{tr}(ABC) = \text{tr}(BCA) = \text{tr}(CAB)
@@ -578,7 +578,7 @@ $$
 -\frac{1}{2} \, \nabla_{\Psi} \sum_{i=1}^{n} \mathbb{E}_{z^{(i)} \sim Q_i} \left[\log |\Psi| + \left(x^{(i)} - \mu - W z^{(i)}\right)^T \Psi^{-1} \left(x^{(i)} - \mu - W z^{(i)}\right) \right]
 $$
 
-Ignoring terms that do not depend on $W$.
+Ignoring terms that do not depend on $\Psi$.
 </Info>
 
 <Info>

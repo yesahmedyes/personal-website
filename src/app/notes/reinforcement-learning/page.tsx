@@ -15,13 +15,7 @@ export default function Page() {
       <div className="flex flex-col h-full w-full justify-center bg-bgLessDark">
         <div className="flex w-9/12 2xl:w-8/12 flex-col rounded-sm bg-white p-16 mx-auto my-12 gap-3">
           <div className="text-textBlack text-xl lg:text-2xl font-semibold text-center pb-4">Reinforcement Learning</div>
-
-          <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/reinforcement-learning/${item.id}` }))} />
-
-          <div className="text-sm leading-7 pt-4">
-            <span className="font-semibold">Note: </span>I wrote these notes for my own reference while I was doing the CS234 Reinforcement Learning course offered by Emma Brunskill at Stanford
-            University in Spring 2024. I hope they are useful for others.
-          </div>
+          <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/reinforcement-learning/${item.id}` }))} />{" "}
         </div>
       </div>
     </>

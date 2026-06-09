@@ -9,7 +9,7 @@ Also, let $x$ given $z$ follow a normal distribution $x | z \sim \mathcal{N}\lef
 
 Note that for [Gaussian Mixture Models](gaussian-mixture-models), the optimal choice of $Q(z) = p(z | x; \theta)$ and we found it using Bayes' rule. We were able to do so because $z$ was discrete and could take only $k$ values.
 
-However, for more complex models like the Variational Autoencoder, $z$ is continous. Therefore, it is intractable to compute $p(z | x; \theta)$ explicitly. Instead, we will try to find an approximation of $p(z | x; \theta)$.
+However, for more complex models like the Variational Autoencoder, $z$ is continuous. Therefore, it is intractable to compute $p(z | x; \theta)$ explicitly. Instead, we will try to find an approximation of $p(z | x; \theta)$.
 
 Also note that we wanted to find $Q(z) = p(z | x; \theta)$ so that our $\text{ELBO}$ would be tight with $\log p(x; \theta)$.
 
@@ -83,7 +83,7 @@ We can find all three derivatives by backpropagating through their respective ne
 
 $p(x^{(i)} \mid z^{(i)}; \theta)$ depends on the decoder neural network $g(z^{(i)} ; \theta)$. And $Q_i(z^{(i)})$ depends on the encoder neural networks $q(x^{(i)}; \phi)$ and $v(x^{(i)}; \psi)$.
 
-Ofcourse, since we still have an expectancy, we will have to take multiple samples of $z^{(i)}$ in case of $\theta$, and $\xi^{(i)}$ in case of $\psi$ and $\phi$ and then take an average over the derivatives.
+Of course, since we still have an expectation, we will have to take multiple samples of $z^{(i)}$ in case of $\theta$, and $\xi^{(i)}$ in case of $\psi$ and $\phi$ and then take an average over the derivatives.
 
 <Derivation className="mt-3 mb-0">
 $$
@@ -144,7 +144,7 @@ $$
 z^{(i)} = q(x^{(i)}; \, \phi) + v(x^{(i)}; \, \psi) \odot \xi^{(i)}
 $$
 
-For convenience, i will use $\hat{z}^{(i)}$ as the reparameterized $z^{(i)}$. But ofcourse, $\hat{z}^{(i)} = z^{(i)}$. Now plugging $\hat{z}^{(i)}$ into the equation, we get:
+For convenience, I will use $\hat{z}^{(i)}$ as the reparameterized $z^{(i)}$. But of course, $\hat{z}^{(i)} = z^{(i)}$. Now plugging $\hat{z}^{(i)}$ into the equation, we get:
 
 $$
 \nabla_{\phi} \text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right) = \nabla_{\phi} \, \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \, \left[\log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right]
@@ -154,5 +154,5 @@ $$
 = \sum_{i=1}^n \left[ \mathbb{E}_{\xi^{(i)} \sim \mathcal{N}(0, 1)} \left[\nabla_{\phi} \log p \left(x^{(i)} \mid \hat{z}^{(i)}; \theta \right) \right] - \nabla_{\phi} \, D_{KL}\left(Q_i(\hat{z}^{(i)}) \parallel p(\hat{z}^{(i)} \right) \right ]
 $$
 
-The solution for the derivate of $\text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right)$ with respect to $\psi$ is similar.
+The solution for the derivative of $\text{ELBO}\left(x^{(i)}; \, \phi, \psi, \theta \right)$ with respect to $\psi$ is similar.
 </Derivation>

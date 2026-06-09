@@ -4,8 +4,6 @@
 
 ## Introduction
 
-Reinforcement learning is a type of machine learning that is used to make decisions based on a set of features. It is a type of supervised learning model that is used to classify data into different categories.
-
 A Markov Decision Process (MDP) is a mathematical framework used to model decision-making in situations where outcomes are uncertain. It is formulated using a tuple $(S, A, P_{sa}, \gamma, R)$, where:
 
 - $S$ is the set of states.
@@ -126,7 +124,7 @@ $$
 
 For small MDPs, Policy iteration converges faster. However, for large MDPs, solving for $V^{\pi}$ in each step of policy iteration involves solving a large system of linear equations, which is computationally expensive.
 
-Usually, we do not know the state transition probabilities $P_{sa}$ before hand. Instead, they can be estimated by repeatedly running the agent on the MDP under policy $π$ and using the following formula:
+Usually, we do not know the state transition probabilities $P_{sa}$ beforehand. Instead, they can be estimated by repeatedly running the agent on the MDP under policy $π$ and using the following formula:
 
 $$
 P_{sa}(s') = \frac{\text{\# of times we took action } a \text{ in state } s \text{ and ended up in state } s'}{\text{\# of times we took action } a \text{ in state } s}
@@ -136,7 +134,7 @@ $$
 
 ## Value Function Approximation
 
-One way to deal with continuous state spaces in MDPs is to descretize the state space. If we have $d$ dimensions and we discretize each dimension with $k$ values, then we have $k^d$ states. As we increase $k$, the number of states grows exponentially.
+One way to deal with continuous state spaces in MDPs is to discretize the state space. If we have $d$ dimensions and we discretize each dimension with $k$ values, then we have $k^d$ states. As we increase $k$, the number of states grows exponentially.
 
 To deal with this, we can use function approximation.
 
@@ -180,7 +178,7 @@ $$
 \epsilon \sim \mathcal{N}(0, \Sigma)
 $$
 
-Now, if we assume that the our state space is continous but our action space is small and discrete, we can use the Fitted value iteration algorithm.
+Now, if we assume that our state space is continuous but our action space is small and discrete, we can use the Fitted value iteration algorithm.
 
 $$
 s_{t+1} - (A s_t + B a_t) = \epsilon
@@ -204,13 +202,13 @@ $$
 V(s) \leftarrow R(s) + \gamma \cdot \max_{a \in A} \left(\int_{s'} P_{sa}(s') V(s') \, ds' \right)
 $$
 
-However, since out states $s$ are continuous, we have to approximate the value function $V(s)$ as well. We do so by finding a linear or non-linear mapping from states to the value function:
+However, since our states $s$ are continuous, we have to approximate the value function $V(s)$ as well. We do so by finding a linear or non-linear mapping from states to the value function:
 
 $$
 V(s) = \theta^T \phi(s)
 $$
 
-We also can not directly update our $V(s)$ from the value iteration update rule. Instead, we have to update our $\theta$ parameters.
+We also cannot directly update our $V(s)$ from the value iteration update rule. Instead, we have to update our $\theta$ parameters.
 
 We do this by minimizing the squared error:
 

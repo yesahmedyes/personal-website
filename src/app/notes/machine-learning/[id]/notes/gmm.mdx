@@ -4,7 +4,7 @@
 
 Suppose that we are given a training set $x^{(1)}, \ldots, x^{(n)}$ and we wish to model the data by specifying a joint distribution $p(x^{(i)}, z^{(i)})$ where $z^{(i)} \sim \text{Multinomial}(\phi)$ is a latent variable where $p(z^{(i)} = j) = \phi_j$ and $\sum_{j=1}^k \phi_j = 1$ where $k$ is the number of values that $z^{(i)}$ can take.
 
-Moreover, we assume that $x^{(i)} | z^{(i)} = j \sim \mathcal{N}(\mu_j, \Sigma_j)$. Gaussian mixture models are similar to the [K-means Algorithm](/notes/machine-learning/clustering) except that we allow for overlapping clusters and each each cluster follows a Gaussian distribution.
+Moreover, we assume that $x^{(i)} | z^{(i)} = j \sim \mathcal{N}(\mu_j, \Sigma_j)$. Gaussian mixture models are similar to the [K-means Algorithm](/notes/machine-learning/clustering) except that we allow for overlapping clusters and each cluster follows a Gaussian distribution.
 
 To maximize the log likelihood, we need to maximize:
 
@@ -18,9 +18,9 @@ $$
 
 The random variables $z^{(i)}$'s indicate which of the $k$ Gaussians each $x^{(i)}$ had come from. Note that if we knew what the $z^{(i)}$'s were, the maximum likelihood problem would have been easy and almost similar to that of [Gaussian Discriminant Analysis](/notes/machine-learning/generative-learning-algorithms).
 
-Since there is no way for us to take the derivative of the above equation and find a closed form solution, we need to use the [Expectancy Maximization Algorithm](/notes/machine-learning/em-algorithm) instead.
+Since there is no way for us to take the derivative of the above equation and find a closed form solution, we need to use the [Expectation Maximization Algorithm](/notes/machine-learning/em-algorithm) instead.
 
-In the $E$ step, for all values of $i$ and $j$, we find $p(z^{(i)} = j | x^{(i)}; \phi, \mu, \Sigma)$ using the current parameters and the bayes rule:
+In the $E$ step, for all values of $i$ and $j$, we find $p(z^{(i)} = j | x^{(i)}; \phi, \mu, \Sigma)$ using the current parameters and Bayes' rule:
 
 $$
 p(z^{(i)} = j | x^{(i)}; \phi, \mu, \Sigma) = \frac{p(x^{(i)} | z^{(i)} = j; \mu, \Sigma) p(z^{(i)} = j; \phi)}{\sum_{l=1}^k p(x^{(i)} | z^{(i)} = l; \mu, \Sigma) p(z^{(i)} = l; \phi)}
@@ -39,7 +39,7 @@ $$
 
 <Info>
 $$
-= \frac{\left(|\Sigma_j|^{-\frac{1}{2}}\right) \exp \left( -\frac{1}{2} (x^{(i)} - \mu_j)^T \Sigma_j^{-1} (x^{(i)} - \mu_j) \right) \phi_j}{\sum_{l=1}^k \left[\left(|\Sigma_j|^{-\frac{1}{2}}\right) \exp \left( -\frac{1}{2} (x^{(i)} - \mu_l)^T \Sigma_l^{-1} (x^{(i)} - \mu_l) \right) \phi_l\right]}
+= \frac{\left(|\Sigma_j|^{-\frac{1}{2}}\right) \exp \left( -\frac{1}{2} (x^{(i)} - \mu_j)^T \Sigma_j^{-1} (x^{(i)} - \mu_j) \right) \phi_j}{\sum_{l=1}^k \left[\left(|\Sigma_l|^{-\frac{1}{2}}\right) \exp \left( -\frac{1}{2} (x^{(i)} - \mu_l)^T \Sigma_l^{-1} (x^{(i)} - \mu_l) \right) \phi_l\right]}
 $$
 
 Since $2\pi^{-d/2}$ is a constant, it cancels out.
@@ -189,7 +189,7 @@ $$
 \Rightarrow \Sigma_l^{-1} \left[\sum_{i=1}^n w_l^{(i)} x^{(i)} \right] = \Sigma_l^{-1} \left[ \sum_{i=1}^n w_l^{(i)}\right] \mu_l
 $$
 
-Since $\Sigma_l^{-1}$ and $\mu_l^{-1}$ do not depend on $i$
+Since $\Sigma_l^{-1}$ and $\mu_l$ do not depend on $i$
 </Info>
 
 $$
@@ -329,7 +329,7 @@ $$
 = \sum_{i=1}^n w_l^{(i)} \left(- \nabla_{\Sigma_l} \left[\log \, |\Sigma_l|^{1/2} \right] -\frac{1}{2} \nabla_{\Sigma_l} \left[ \left(x^{(i)} - \mu_l\right)^T \Sigma_l^{-1} \left(x^{(i)} - \mu_l\right) \right] \right)
 $$
 
-We are going to find the two derivates separately,
+We are going to find the two derivatives separately,
 
 $$
  \nabla_{\Sigma_l} \left[\log |\Sigma_l|^{1/2} \right]

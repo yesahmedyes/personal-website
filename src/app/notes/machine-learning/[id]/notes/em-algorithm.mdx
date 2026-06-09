@@ -1,5 +1,5 @@
 <center>
-# Expectancy Maximization Algorithm
+# Expectation Maximization Algorithm
 </center>
 
 ## General Formulation
@@ -20,7 +20,7 @@ $$
 = \sum_{i=1}^n \log \sum_{z^{(i)}} p(x^{(i)}; z^{(i)}; \theta)
 $$
 
-However, the above equation is not concave with respect to $\theta$. Hence, we can not use gradient ascent to find the maximum likelihood estimate.
+However, the above equation is not concave with respect to $\theta$. Hence, we cannot use gradient ascent to find the maximum likelihood estimate.
 
 Moreover, if $p(x; z; \theta)$ is an exponential family distribution, then taking the derivative of the above equation with respect to $\theta$ doesn't typically lead to a solvable expression.
 
@@ -133,7 +133,7 @@ $$
 </Derivation>
 
 <Derivation className="mt-0 mb-3">
-We can verfiy that setting $Q(z) = p(z | x; \theta)$ leads to a tight bound:
+We can verify that setting $Q(z) = p(z | x; \theta)$ leads to a tight bound:
 
 $$
 \sum_z \left[Q(z) \log\frac{p(x, z; \theta)}{Q(z)}\right]
@@ -240,13 +240,13 @@ $$
 \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t+1)}) \geq \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t)})
 $$
 
-Finally, in the $E$ step, $Q(z)$ is choosen such that for the current value of $\theta$, the log-likelihood and the evidence lower bound are equal.
+Finally, in the $E$ step, $Q(z)$ is chosen such that for the current value of $\theta$, the log-likelihood and the evidence lower bound are equal.
 
 $$
 \sum_{i=1}^{n} \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^ {(t)}) = \ell(\theta^{(t)})
 $$
 
-Putting it all together, we have the following 
+Putting it all together, we have the following inequality:
 
 $$
 \ell(\theta^{(t+1)}) \geq \ell(\theta^{(t)})

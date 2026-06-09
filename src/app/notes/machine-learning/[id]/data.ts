@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { lazy } from "react";
 
 const LinearRegressionMDX = lazy(() => import("./notes/linear-regression.mdx"));
@@ -59,7 +58,7 @@ export const data = [
   },
   {
     id: "em-algorithm",
-    title: "Expectancy Maximization Algorithm",
+    title: "Expectation Maximization Algorithm",
     component: EMAlgorithmMDX,
   },
   {

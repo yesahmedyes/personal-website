@@ -17,11 +17,6 @@ export default function Page() {
           <div className="text-textBlack text-xl lg:text-2xl font-semibold text-center pb-4">Machine Learning</div>
 
           <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/machine-learning/${item.id}` }))} />
-
-          <div className="text-sm leading-7 pt-4">
-            <span className="font-semibold">Note: </span>I wrote these notes for my own reference while I was doing the CS229 Machine Learning course offered by Anand Avati at Stanford University in
-            Summer 2020. I hope they are useful for others.
-          </div>
         </div>
       </div>
     </>

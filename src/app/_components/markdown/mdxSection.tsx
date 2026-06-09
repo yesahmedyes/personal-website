@@ -1,5 +1,6 @@
 import { MDXProvider } from "@mdx-js/react";
 import Derivation from "./derivation";
+import Figure from "./figure";
 import Lemma from "./lemma";
 import React from "react";
 import Info from "./info";
@@ -30,6 +31,7 @@ const components = {
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props} className="text-blue-500 hover:text-blue-600 hover:underline" />,
   br: (props: React.HTMLAttributes<HTMLBRElement>) => <br {...props} className="" />,
   Margin: (props: React.HTMLAttributes<HTMLDivElement>) => <div {...props} className="my-4" />,
+  Figure,
   Derivation,
   Detour,
   Info,

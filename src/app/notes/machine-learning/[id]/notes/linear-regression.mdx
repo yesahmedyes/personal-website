@@ -16,6 +16,10 @@ $$
 J(\theta) = \frac{1}{2} \sum_{i=1}^{n} \left(h_{\theta}(x^{(i)}) - y^{(i)} \right)^2
 $$
 
+<Figure src="/images/notes/linear-regression-residuals.png" alt="Linear regression fit with vertical residuals from each data point to the fitted line" className="py-20">
+    The cost function measures the squared vertical residuals between each training label and the fitted line.
+</Figure>
+
 Taking the derivative with respect to any $\theta_j$ we get:
 
 $$
@@ -55,6 +59,10 @@ With this derivative, we can now use gradient descent to take small steps toward
 $$
 \theta_j \leftarrow \theta_j + \alpha \left( y^{(i)} - h_\theta (x^{(i)}) \right) x_j^{(i)}
 $$
+
+<Figure src="/images/notes/linear-regression-cost.png" alt="Gradient descent path over contour lines of the linear regression cost function">
+    Gradient descent updates $\theta$ by moving downhill along the contours of $J(\theta)$ until it reaches the minimum.
+</Figure>
 
 <Algorithm>
 
@@ -110,11 +118,15 @@ $$
 = \frac{1}{2} \left(X\theta - \vec{y} \right)^T \left(X\theta - \vec{y} \right)
 $$
 
-Finally, to minimize $J(\theta)$, we find its derivative with respect $\theta$, set it equal to $0$ and simplify to see that $\theta$ is minimized when,
+Finally, to minimize $J(\theta)$, we find its derivative with respect to $\theta$, set it equal to $0$ and simplify to see that $\theta$ is minimized when,
 
 $$
 \theta = \left(X^TX\right)^{-1}X^T \vec{y}
 $$
+
+<Figure src="/images/notes/linear-regression-projection.png" alt="Orthogonal projection of the target vector onto the column space of the design matrix">
+    The closed-form solution chooses the prediction vector $\hat{y} = X\theta$ that is closest to $\vec{y}$ inside the column space of $X$.
+</Figure>
 
 <Derivation>
 $$
@@ -187,7 +199,7 @@ $$
 -\frac{1}{2} \sum_{i=1}^{n} \left(y^{(i)} - \theta^T x^{(i)} \right)^2
 $$
 
-Notice, that the function that we need to minimized does not depend on $\sigma$ which means that we don't need to know that variance of our noise to be able to maximize our likelihood.
+Notice that the function that we need to minimize does not depend on $\sigma$, which means that we don't need to know the variance of our noise to be able to maximize our likelihood.
 
 
 <Derivation>

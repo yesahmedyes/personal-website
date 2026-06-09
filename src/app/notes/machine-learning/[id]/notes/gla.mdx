@@ -4,7 +4,7 @@
 
 ## Gaussian Discriminant Analysis
 
-If we want to classify between cats and dogs, discrimnative learning algorithms try to learn a hyperplane that separates the two classes directly. Generative learning algorithms, try to learn a model for what cats look like and a separate model to learn what dogs look like.
+If we want to classify between cats and dogs, discriminative learning algorithms try to learn a hyperplane that separates the two classes directly. Generative learning algorithms, try to learn a model for what cats look like and a separate model to learn what dogs look like.
 
 After modelling $p(x \mid y)$ for each class and the class prior $p(y)$, we can classify a new example by computing the posterior $p(y \mid x)$ for each class and picking the class with the highest posterior probability.
 
@@ -132,7 +132,7 @@ $$
 \nabla_{\mu_0} \, \sum_{i=1}^n \left(1 - y^{(i)}\right) \log p\left(x^{(i)} \mid y^{(i)} = 0; \mu_0, \Sigma \right)
 $$
 
-Ignoring terms that are constant with respect to $\phi$.
+Ignoring terms that are constant with respect to $\mu_0$.
 </Info>
 
 $$
@@ -187,7 +187,7 @@ $$
 \Rightarrow \Sigma^{-1} \left[\sum_{i=1}^n \left(1 - y^{(i)}\right) x^{(i)} \right] = \Sigma^{-1} \left[ \sum_{i=1}^n \left(1 - y^{(i)}\right)\right] \mu_0
 $$
 
-Since $\Sigma_l^{-1}$ and $\mu_l^{-1}$ do not depend on $i$
+Since $\Sigma^{-1}$ and $\mu_0$ do not depend on $i$
 </Info>
 
 $$
@@ -254,7 +254,7 @@ $$
 $$
 </Lemma>
 
-We are going to find the two derivates separately,
+We are going to find the two derivatives separately,
 
 $$
 \nabla_{\Sigma} \left[\log |\Sigma|^{1/2} \right]
@@ -353,7 +353,7 @@ $$
 
 ## Naive Bayes
 
-When our feacture vectors $x$ take on discrete values, we can use the Naive Bayes.
+When our feature vectors $x$ take on discrete values, we can use the Naive Bayes.
 
 $$
 x \in \{0, 1\}^d
@@ -395,7 +395,7 @@ $$
 $$
 
 $$
-= \sum_{i=1}^n \, \left( \sum_{j=1}^d \left( \log \left(\phi_{j \mid y = 1} \right)^{x_j^{(i)} y^{(i)}} + \log \left(1 - \phi_{j \mid y = 1} \right)^{\left(1 - x_j^{(i)} \right) y^{(i)}} + \log \left(\phi_{j \mid y = 0}\right)^{x_j^{(i)} \left(1 - y^{(i)} \right)} + \log \left(\phi_{j \mid y = 0}\right)^{\left(1 - x_j^{(i)} \right) \left(1 - y^{(i)} \right)}  \right) \right.
+= \sum_{i=1}^n \, \left( \sum_{j=1}^d \left( \log \left(\phi_{j \mid y = 1} \right)^{x_j^{(i)} y^{(i)}} + \log \left(1 - \phi_{j \mid y = 1} \right)^{\left(1 - x_j^{(i)} \right) y^{(i)}} + \log \left(\phi_{j \mid y = 0}\right)^{x_j^{(i)} \left(1 - y^{(i)} \right)} + \log \left(1 - \phi_{j \mid y = 0}\right)^{\left(1 - x_j^{(i)} \right) \left(1 - y^{(i)} \right)}  \right) \right.
 $$
 
 $$
@@ -495,12 +495,12 @@ Since both $x_k^{(i)}$ and $y^{(i)}$ are either $0$ or $1$.
 Similarly, taking the derivative with respect to $\phi_{k \mid y = 0}$, we get:
 
 $$
-\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^n \left(1 - y^{(i)} \right) x_k^{(i)}}{\sum_{i=1}^n \left(1 - y^{(i)} \right)}
+\Rightarrow \phi_{k \mid y = 0} = \frac{\sum_{i=1}^n \left(1 - y^{(i)} \right) x_k^{(i)}}{\sum_{i=1}^n \left(1 - y^{(i)} \right)}
 $$
 
 <Info>
 $$
-\Rightarrow \phi_{k \mid y = 1} = \frac{\sum_{i=1}^{n} 1\left\{x_k^{(i)} = 1 \land y^{(i)} = 0\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 0\right\}}
+\Rightarrow \phi_{k \mid y = 0} = \frac{\sum_{i=1}^{n} 1\left\{x_k^{(i)} = 1 \land y^{(i)} = 0\right\}}{\sum_{i=1}^{n} 1\left\{y^{(i)} = 0\right\}}
 $$
 
 Since both $x_k^{(i)}$ and $y^{(i)}$ are either $0$ or $1$.
@@ -517,9 +517,9 @@ $$
 p(y = 1|x) = \frac{\left( \prod_{j=1}^{d} p(x_j|y = 1) \right) p(y = 1)}{\left( \prod_{j=1}^{d} p(x_j|y = 1) \right) p(y = 1) + \left( \prod_{j=1}^{d} p(x_j|y = 0) \right) p(y = 0)}
 $$
 
-However, there is a problem with this approach. If any of the $p(x_j|y = 1)$, then our prediction will be 0. This happens if we don't have any training example for which a particular $x_j$ is $1$.
+However, there is a problem with this approach. If any of the $p(x_j|y = 1)$ is 0, then our prediction will be 0. This happens if we don't have any training example for which a particular $x_j$ is $1$.
 
-As a work around, we apply Laplace smoothing. Our parameters then become:
+As a workaround, we apply Laplace smoothing. Our parameters then become:
 
 $$
 \phi_{j \mid y = 1} = \frac{1 + \sum_{i=1}^{n} 1\left\{x_j^{(i)} = 1 \land y^{(i)} = 1\right\}}{2 + \sum_{i=1}^{n} 1\left\{y^{(i)} = 1\right\}}

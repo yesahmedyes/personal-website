@@ -10,7 +10,7 @@ $$
 y^{(i)} = h^*(x^{(i)}) + \xi^{(i)}
 $$
 
-where $h^*$ is the best possible classifier that maps the relationship between $x$ and $y$, and $\xi^{(i)} \in \mathcal{N}(0, \sigma^2)$ is the noise in the $ith$ example.
+where $h^*$ is the best possible classifier that maps the relationship between $x$ and $y$, and $\xi^{(i)} \in \mathcal{N}(0, \sigma^2)$ is the noise in the $i$th example.
 
 Also, let ${h}_s$ be our best fit model for the dataset $S$. The Mean Squared Error (MSE) can be written as:
 
@@ -49,7 +49,7 @@ $$
 = \mathbb{E}[A^2] + \mathbb{E}[B^2] + 2\mathbb{E}[A]\mathbb{E}[B]
 $$
 
-For two indepedent events, their joint expectancy is the product of their individual expectancies.
+For two independent events, their joint expectation is the product of their individual expectations.
 </Info>
 
 <Info>
@@ -138,7 +138,7 @@ $$
 
 The Bias-Variance tradeoff tells us that as we increase the number of parameters in our neural network, the test error will decrease because the bias is decreasing. However, after a certain point the variance starts increasing faster than the bias is decreasing and therefore, the test error will start to increase.
 
-In reality, however, we see a double descent phenomenon wherein the test error starts to decrease again at the point where the number of parameters $d$ are approximately equal to the number of training examples $d$. This is called the over-parameterization regime.
+In reality, however, we see a double descent phenomenon wherein the test error starts to decrease again at the point where the number of parameters $d$ are approximately equal to the number of training examples $n$. This is called the over-parameterization regime.
 
 <Margin />
 
@@ -190,7 +190,7 @@ $$
 
 We call this the uniform convergence result.
 
-This means that as n increases, the probability of the true error being close to the empirical error is bounded by a bigger value. Whereas, as we increases the number of hypotheses in our set, this probability is actually bounded by a smaller value.
+This means that as $n$ increases, the probability of the true error being close to the empirical error is bounded by a bigger value. Whereas, as we increase the number of hypotheses in our set, this probability is actually bounded by a smaller value.
 
 In the context of learning, we can say that the more complex our model, the lower our probability of minimizing the empirical error. And the more the number of training examples, the higher our probability of minimizing the empirical error.
 
@@ -248,7 +248,7 @@ $$
 
 Now let $\delta = 2k\exp\left(-2\gamma^2 n\right)$
 
-We see that if we want the probability of "the true error being within $\gamma$ to the empirical error for all hypothesiss under our consideration" to be at least $1 - \delta$, our $n$ needs to be atleast as large as:
+We see that if we want the probability of "the true error being within $\gamma$ to the empirical error for all hypotheses under our consideration" to be at least $1 - \delta$, our $n$ needs to be at least as large as:
 
 $$
 n \geq \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
@@ -285,14 +285,14 @@ $$
 P\left(\forall h \in \mathcal{H}.\left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \gamma \right) \geq 1 - \delta
 $$
 
-Therefore n need to be atleast as large as:
+Therefore $n$ needs to be at least as large as:
 
 $$
 \Rightarrow n \geq \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
 $$
 </Derivation>
 
-Similarly, we can also see that given $k$ and $n$, the difference between the true error and the empirical error (for all hypotheses is our set) will always be less than:
+Similarly, we can also see that given $k$ and $n$, the difference between the true error and the empirical error (for all hypotheses in our set) will always be less than:
 
 $$
 \left|\epsilon(h_i) - \hat{\epsilon}(h_i)\right | \leq \sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}
@@ -332,7 +332,7 @@ $$
 $$
 </Derivation>
 
-Next, in our set of hypothesiss $\mathcal{H}$, let $h^*$ be the hypothesis that minimizes the true error and $\hat{h}$ be the hypothesis that minimizes our empirical error.
+Next, in our set of hypotheses $\mathcal{H}$, let $h^*$ be the hypothesis that minimizes the true error and $\hat{h}$ be the hypothesis that minimizes our empirical error.
 
 Using our uniform convergence assumption, we can see that:
 

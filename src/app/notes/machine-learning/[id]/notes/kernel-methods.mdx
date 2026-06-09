@@ -16,7 +16,7 @@ $$
 \theta \leftarrow \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T \phi(x^{(i)})\right)\phi(x^{(i)})
 $$
 
-However, this can become computationally expensive if the feature mapping is too complex. For example, if $\phi(x)$ is a vector that contains all the monomials of $x$ with degree $\leq 3$, then the dimension of our features are $d^3$ where $d$ is the dimension of $x$.
+However, this can become computationally expensive if the feature mapping is too complex. For example, if $\phi(x)$ is a vector that contains all the monomials of $x$ with degree $\leq 3$, then the dimension of our features is $d^3$ where $d$ is the dimension of $x$.
 
 This would mean that $\theta$ would also have $d^3$ parameters and we will need to compute $d^3$ gradient updates.
 
@@ -40,7 +40,7 @@ $$
 \theta \leftarrow \sum_{i=1}^{n} \left( \underbrace{\beta_i + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right)}_{\text{new } \beta_i} \right) \phi(x^{(i)})
 $$
 
-With this, to fine the new $\theta$, we only need to compute the new $\beta_i$'s for all of our training examples. And the new $\beta_i$'s can be found using the following update:
+With this, to find the new $\theta$, we only need to compute the new $\beta_i$'s for all of our training examples. And the new $\beta_i$'s can be found using the following update:
 
 $$
 \beta_i \leftarrow \beta_i + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right)

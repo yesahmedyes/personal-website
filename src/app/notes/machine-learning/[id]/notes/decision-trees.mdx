@@ -4,7 +4,7 @@
 
 ## Introduction
 
-In the [K-means Algorithm](/notes/machine-learning/clustering), we made an inherent assumption that data points of various classes are not randomly sprinkled across the space, but instead appear in cluseters of more or less homogeneous space.
+In the [K-means Algorithm](/notes/machine-learning/clustering), we made an inherent assumption that data points of various classes are not randomly sprinkled across the space, but instead appear in clusters of more or less homogeneous space.
 
 Decision trees exploit this very assumption to build a tree structure that recursively divides the feature space into regions with similar labels.
 
@@ -98,11 +98,11 @@ $$
 $$
 
 $$
-= \arg \min_p H(s)
+= \arg \min_p H(p)
 $$
 </Derivation>
 
-However, building a maximally compact tree with only pure leaves for any data set is a NP-hard problem. Therefore, we use a greedy approach instead.
+However, building a maximally compact tree with only pure leaves for any data set is an NP-hard problem. Therefore, we use a greedy approach instead.
 
 One example of this is the ID3 algorithm. In this algorithm, we start at the root node and at each step select the feature $x_j$ that best separates the data and minimizes the impurity. We then recurse on the left and right subsets defined by this split until we can no longer split the data.
 
@@ -125,14 +125,14 @@ The variance term indicates how much the model's predictions would change if it 
 If we let $D_i$ be the $i$th dataset, then for $n$ datasets, we can define the average model as the ensemble average:
 
 $$
-\hat{h}(x) = \frac{1}{n} \sum_{j=1}^{n} h_{D_i}(x)
+\hat{h}(x) = \frac{1}{n} \sum_{j=1}^{n} h_{D_j}(x)
 $$
 
 As $n \to \infty$, according to the Law of Large Numbers, our average model $\hat{h}(x)$ will converge to $h_{avg}(x)$.
 
 This means that if we have infinite datasets and we train our classifiers on each data set and then take an average, we can reduce the variance to $0$.
 
-However, we do not have infinite datasets, we only have one. Therefore, we use Bootstraping instead. We sample $n$ datasets with replacement from our original dataset $D$.
+However, we do not have infinite datasets, we only have one. Therefore, we use Bootstrapping instead. We sample $n$ datasets with replacement from our original dataset $D$.
 
 Note that doing this means that our datasets are not independent and identically distributed and according to the Law of Large Numbers is no longer guaranteed. In practice, however, doing this still helps us reduce the variance to some extent.
 
@@ -255,7 +255,7 @@ From this it follows that such a vector will have a negative dot product with $H
 Therefore, we want to select $h_{t+1}$ such that:
 
 $$
-\left[H_t\left(x^{(i)}\right) - y^{(i)}\right] \cdot h_{t+1}\left(x^{(i)}\right) \lt 0
+\left[H_t\left(x^{(i)}\right) - y^{(i)}\right] \cdot h_{t+1}\left(x^{(i)}\right) < 0
 $$
 
 We can use this observation to write a Generic Boosting algorithm.
@@ -364,7 +364,7 @@ $$
 $\sum_{j=1}^{n} e^{-y^{(j)} \cdot H(x^{(j)})}$ is a constant with respect to $h$ and does not depend on $i$.
 </Info>
 
-Now if we let define a new weight for each data point as:
+Now if we define a new weight for each data point as:
 
 $$
 w^{(i)} = \frac{\exp\left(-y^{(i)} \cdot H(x^{(i)})\right)}{\sum_{j=1}^{n} \exp\left(-y^{(j)} \cdot H(x^{(j)})\right)}

@@ -1,5 +1,5 @@
 <center>
-# Linear Regression
+# Classification
 </center>
 
 ## Logistic Regression
@@ -12,7 +12,11 @@ $$
 h_{\theta}(x) = g(\theta^T x) = \frac{1}{1 + e^{-\theta^T x}}
 $$
 
-Let's us assume that:
+<Figure src="/images/notes/classification-sigmoid.png" alt="Sigmoid curve mapping real-valued scores to probabilities between 0 and 1">
+    The sigmoid function converts the score $\theta^T x$ into a probability, with $g(0) = \frac{1}{2}$.
+</Figure>
+
+Let's assume that:
 
 $$
 p(y=1 ; x, \theta) = h_{\theta}(x)
@@ -28,6 +32,10 @@ $$
 p(y \mid x, \theta) = (h_{\theta}(x))^y (1 - h_{\theta}(x))^{1 - y}
 $$
 
+<Figure src="/images/notes/classification-decision-boundary.png" alt="Binary classification decision boundary separating two classes">
+    Logistic regression predicts one class on one side of the boundary $\theta^T x = 0$ and the other class on the opposite side.
+</Figure>
+
 Now, the log-likelihood can be written as:
 
 $$
@@ -42,7 +50,7 @@ $$
 = \sum_{i=1}^n \, \log \, \left[\left(h_{\theta}(x^{(i)})\right)^{y^{(i)}} \left(1 - h_{\theta}(x^{(i)})\right)^{1 - y^{(i)}} \right]
 $$
 
-Taking it's derivative with respect to $\theta$, we get:
+Taking its derivative with respect to $\theta$, we get:
 
 $$
 \frac{\partial}{\partial \theta_j} \, \ell(\theta) = \sum_{i=1}^n \left(y^{(i)} - h_{\theta}(x^{(i)}) \right) x_j^{(i)}
@@ -61,7 +69,7 @@ $$
 g(z) = \frac{1}{1 + e^{-z}}
 $$
 
-It's derivative is given by:
+Its derivative is given by:
 
 $$
 \frac{d}{dz} \, g(z) = \frac{d}{dz} \, \frac{1}{1 + e^{-z}}

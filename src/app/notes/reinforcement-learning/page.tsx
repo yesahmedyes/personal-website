@@ -15,7 +15,11 @@ export default function Page() {
       <div className="flex flex-col h-full w-full justify-center bg-bgLessDark">
         <div className="flex w-9/12 2xl:w-8/12 flex-col rounded-sm bg-white p-16 mx-auto my-12 gap-3">
           <div className="text-textBlack text-xl lg:text-2xl font-semibold text-center pb-4">Reinforcement Learning</div>
-          <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/reinforcement-learning/${item.id}` }))} />{" "}
+          {data.length > 0 ? (
+            <LinksSection links={data.map((item) => ({ title: item.title, link: `/notes/reinforcement-learning/${item.id}` }))} />
+          ) : (
+            <div className="text-textBlack/60 text-center py-8">Notes coming soon.</div>
+          )}
         </div>
       </div>
     </>

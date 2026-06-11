@@ -1,75 +1,17 @@
-import os
-
 import numpy as np
 import matplotlib
-from PIL import Image
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers 3d projection)
 
-from colors import PALETTE
-
-# Output directory (repo_root/public/images/notes), resolved relative to this file
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-OUT_DIR = os.path.join(REPO_ROOT, "public", "images", "notes")
-
-DPI = 200
-plt.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.size": 13,
-        "text.color": PALETTE["gray_dark"],
-        "axes.edgecolor": PALETTE["gray_dark"],
-        "axes.labelcolor": PALETTE["gray_dark"],
-        "xtick.color": PALETTE["gray_dark"],
-        "ytick.color": PALETTE["gray_dark"],
-        "figure.facecolor": PALETTE["background"],
-        "axes.facecolor": PALETTE["background"],
-        "savefig.facecolor": PALETTE["background"],
-    }
+from style import (
+    setup, clean_axes, save,
+    INK, AXIS, HUE, POINT, EDGE, TINT,
+    FONT, LW, MARK,
 )
 
-
-def _clean_axes(ax):
-    """Light, minimal axes that match the existing note figures."""
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-    for spine in ("left", "bottom"):
-        ax.spines[spine].set_color(PALETTE["gray_dark"])
-    ax.tick_params(length=0)
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-
-def trim_whitespace(path, padding=16, threshold=250):
-    image = Image.open(path).convert("RGBA")
-    pixels = np.asarray(image)
-
-    # Anything sufficiently different from white is treated as content.
-    content = (pixels[:, :, 3] > 0) & np.any(pixels[:, :, :3] < threshold, axis=2)
-    coords = np.argwhere(content)
-    if coords.size == 0:
-        return
-
-    y0, x0 = coords.min(axis=0)
-    y1, x1 = coords.max(axis=0) + 1
-    x0 = max(x0 - padding, 0)
-    y0 = max(y0 - padding, 0)
-    x1 = min(x1 + padding, image.width)
-    y1 = min(y1 + padding, image.height)
-    image.crop((x0, y0, x1, y1)).save(path)
-
-
-def save(fig, name, pad_inches=0.25, trim=False):
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, name)
-    fig.savefig(path, dpi=DPI, bbox_inches="tight", pad_inches=pad_inches)
-    plt.close(fig)
-    if trim:
-        trim_whitespace(path)
-    print(f"wrote {path}")
+setup()
 
 
 # ---------------------------------------------------------------------------
@@ -88,16 +30,16 @@ def figure_residuals():
     y_hat = X @ theta
 
     fig, ax = plt.subplots(figsize=(6.4, 4.6))
-    _clean_axes(ax)
+    clean_axes(ax, spine=INK)
 
     # Residual segments (dashed, drawn under the points)
     for xi, yi, yh in zip(x, y, y_hat):
         ax.plot(
             [xi, xi],
             [yi, yh],
-            color=PALETTE["gray_point"],
+            color=AXIS,
             linestyle=(0, (4, 3)),
-            linewidth=1.3,
+            linewidth=LW.guide,
             zorder=1,
         )
 
@@ -106,8 +48,8 @@ def figure_residuals():
     ax.plot(
         xs,
         theta[0] + theta[1] * xs,
-        color=PALETTE["coral_dark"],
-        linewidth=2.4,
+        color=EDGE.coral,
+        linewidth=LW.line,
         zorder=2,
         label=r"$h_\theta(x) = \theta^T x$",
     )
@@ -116,10 +58,10 @@ def figure_residuals():
     ax.scatter(
         x,
         y,
-        s=70,
-        facecolor=PALETTE["blue_point"],
-        edgecolor=PALETTE["blue_dark"],
-        linewidth=1.4,
+        s=MARK.large,
+        facecolor=POINT.blue,
+        edgecolor=EDGE.blue,
+        linewidth=LW.edge,
         zorder=3,
         label=r"$(x^{(i)},\, y^{(i)})$",
     )
@@ -133,16 +75,16 @@ def figure_residuals():
         xytext=(x[idx] + 1.5, mid_y - 1.0),
         arrowprops=dict(
             arrowstyle="-",
-            color=PALETTE["gray_dark"],
-            linewidth=1.0,
+            color=INK,
+            linewidth=LW.guide,
         ),
     )
     ax.text(
         x[idx] + 1.58,
         mid_y - 1.15,
         r"$h_\theta(x^{(i)}) - y^{(i)}$",
-        color=PALETTE["gray_dark"],
-        fontsize=12,
+        color=INK,
+        fontsize=FONT.annotation,
     )
 
     ax.set_xlabel(r"$x$")
@@ -150,7 +92,7 @@ def figure_residuals():
     ax.legend(
         frameon=False,
         loc="upper left",
-        fontsize=12,
+        fontsize=FONT.annotation,
         handlelength=1.6,
         borderaxespad=0.2,
     )
@@ -197,7 +139,7 @@ def figure_cost():
     path = np.array(path)
 
     fig, ax = plt.subplots(figsize=(6.0, 5.4))
-    _clean_axes(ax)
+    clean_axes(ax, spine=INK)
 
     j_min = cost(*theta_opt)
     j_start = cost(*path[0])
@@ -207,54 +149,54 @@ def figure_cost():
         T1,
         J,
         levels=levels,
-        colors=PALETTE["light_blue"],
-        linewidths=1.1,
+        colors=TINT.blue,
+        linewidths=LW.guide,
     )
 
     # Descent path
     ax.plot(
         path[:, 0],
         path[:, 1],
-        color=PALETTE["gray_dark"],
-        linewidth=1.4,
+        color=INK,
+        linewidth=LW.line,
         zorder=2,
     )
     ax.scatter(
         path[1:, 0],
         path[1:, 1],
-        s=16,
-        color=PALETTE["coral_point"],
-        edgecolor=PALETTE["coral_dark"],
-        linewidth=0.8,
+        s=MARK.small,
+        facecolor=POINT.coral,
+        edgecolor=EDGE.coral,
+        linewidth=LW.edge,
         zorder=3,
     )
 
     # Start and minimum markers
-    ax.scatter(*path[0], s=80, color=PALETTE["coral_dark"], zorder=4)
+    ax.scatter(*path[0], s=MARK.large, color=EDGE.coral, zorder=4)
     ax.annotate(
         "start",
         xy=path[0],
         xytext=(path[0, 0], path[0, 1] + 0.35),
-        fontsize=11,
-        color=PALETTE["gray_dark"],
+        fontsize=FONT.annotation,
+        color=INK,
         ha="center",
     )
     ax.scatter(
         *theta_opt,
         marker="*",
-        s=240,
-        color=PALETTE["green_point"],
-        edgecolor=PALETTE["green_dark"],
-        linewidth=1.0,
+        s=MARK.star,
+        color=HUE.green,
+        edgecolor=EDGE.green,
+        linewidth=LW.guide,
         zorder=4,
     )
     ax.annotate(
         r"$\min_\theta\, J(\theta)$",
         xy=theta_opt,
         xytext=(theta_opt[0] + 0.5, theta_opt[1] - 1.4),
-        fontsize=12,
-        color=PALETTE["gray_dark"],
-        arrowprops=dict(arrowstyle="-", color=PALETTE["gray_dark"], linewidth=0.9),
+        fontsize=FONT.annotation,
+        color=INK,
+        arrowprops=dict(arrowstyle="-", color=INK, linewidth=LW.guide),
     )
 
     ax.set_xlabel(r"$\theta_0$")
@@ -293,14 +235,14 @@ def figure_projection():
         plane[..., 0],
         plane[..., 1],
         plane[..., 2],
-        color=PALETTE["light_blue"],
-        alpha=0.45,
+        color=TINT.blue,
+        alpha=0.45,  # noqa: style -- a 3D plane needs real translucency for depth
         linewidth=0,
         shade=False,
         zorder=1,
     )
 
-    def arrow(vec, color, lw=2.2, label=None, offset=None):
+    def arrow(vec, color, lw=LW.arrow, label=None, offset=None):
         ax.quiver(
             0,
             0,
@@ -314,13 +256,13 @@ def figure_projection():
         )
         if label is not None:
             pos = vec * 1.05 if offset is None else vec + offset
-            ax.text(*pos, label, color=color, fontsize=13)
+            ax.text(*pos, label, color=color, fontsize=FONT.title)
 
     # y, projection y_hat, and the perpendicular residual
-    arrow(y, PALETTE["coral_dark"], label=r"$\vec{y}$")
+    arrow(y, EDGE.coral, label=r"$\vec{y}$")
     arrow(
         y_hat,
-        PALETTE["blue_dark"],
+        EDGE.blue,
         label=r"$\hat{y} = X\theta$",
         offset=np.array([-0.15, -0.05, -0.42]),
     )
@@ -329,9 +271,9 @@ def figure_projection():
         [y_hat[0], y[0]],
         [y_hat[1], y[1]],
         [y_hat[2], y[2]],
-        color=PALETTE["gray_dark"],
+        color=INK,
         linestyle=(0, (4, 3)),
-        linewidth=1.8,
+        linewidth=LW.line,
         zorder=5,
     )
     res_mid = (y + y_hat) / 2
@@ -340,8 +282,8 @@ def figure_projection():
         res_mid[1] + 0.08,
         res_mid[2],
         r"$\vec{y} - \hat{y}$",
-        color=PALETTE["gray_dark"],
-        fontsize=12,
+        color=INK,
+        fontsize=FONT.annotation,
     )
 
     # Small right-angle marker at the foot of the projection
@@ -360,8 +302,8 @@ def figure_projection():
         corner[:, 0],
         corner[:, 1],
         corner[:, 2],
-        color=PALETTE["gray_dark"],
-        linewidth=1.2,
+        color=INK,
+        linewidth=LW.guide,
         zorder=6,
     )
 
@@ -379,8 +321,8 @@ def figure_projection():
         label_pt[1],
         label_pt[2],
         r"$\mathrm{col}(X)$",
-        color=PALETTE["gray_dark"],
-        fontsize=13,
+        color=INK,
+        fontsize=FONT.title,
         zorder=10,
         ha="right",
     )

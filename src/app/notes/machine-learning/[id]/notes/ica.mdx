@@ -18,11 +18,19 @@ $$
 s = W x
 $$
 
+<Figure src="/images/notes/ica-cocktail-party.png" alt="Independent sources mixed into observed microphone signals, then unmixed to recover the sources">
+    Two voices (sources $s$) are mixed by $A$ into the signals $x$ recorded at two microphones; ICA recovers the unmixing $W = A^{-1}$ that separates them back into $\hat{s}$.
+</Figure>
+
 We suppose that the distribution of each source $s_j$ is given by $p_{s}(s_j)$ and is independent of the other sources. Therefore the joint distribution of the sources is:
 
 $$
 p(s) = \prod_{j=1}^d p_{s}(s_j)
 $$
+
+<Figure src="/images/notes/ica-mixing-geometry.png" alt="Independent sources forming a square sheared by the mixing matrix into a parallelogram">
+    Independent sources fill an axis-aligned square; mixing by $A$ shears it into a parallelogram whose edges are the columns $a_1, a_2$, and unmixing is the task of recovering those directions.
+</Figure>
 
 <Detour about="Change of Variables in Probability">
 For any two vectors that are linearly related by $s = Wx$, the absolute value of the determinant of the transformation matrix $W$ gives the factor by which the volume of any region in the space changes.
@@ -157,6 +165,10 @@ $$
 $$
 W \rightarrow RW
 $$
+
+<Figure src="/images/notes/ica-gaussian-ambiguity.png" alt="Non-Gaussian sources form an identifiable parallelogram while Gaussian sources form a rotationally symmetric cloud">
+    Non-Gaussian sources leave visible edges that pin down the mixing directions, but an isotropic Gaussian cloud is rotationally symmetric, so $W$ and $RW$ are indistinguishable.
+</Figure>
 
 Moreover, we have assumed that our data points are independent and identically distributed. This is however, not true for time-series data.
 

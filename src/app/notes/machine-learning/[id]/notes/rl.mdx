@@ -14,6 +14,10 @@ A Markov Decision Process (MDP) is a mathematical framework used to model decisi
 
 Rewards are usually written as functions of states and actions, i.e. $R(s, a)$ or simply just states, i.e. $R(s)$.
 
+<Figure src="/images/notes/rl-agent-environment.png" alt="The agent-environment interaction loop of a Markov decision process">
+    At each step the agent takes an action $a_t$, and the environment responds with a new state $s_{t+1}$ and a reward $R(s_t)$.
+</Figure>
+
 Our goal is to find actions that maximize the expected sum of discounted rewards.
 
 $$
@@ -155,6 +159,10 @@ $$
 $$
 s_0^{(n)} \xrightarrow{a_0^{(n)}} s_1^{(n)} \xrightarrow{a_1^{(n)}} s_2^{(n)} \xrightarrow{a_2^{(n)}} \cdots \xrightarrow{a_{T-1}^{(n)}} s_T^{(n)}
 $$
+
+<Figure src="/images/notes/rl-rollouts.png" alt="Several sampled trajectories through a continuous state space">
+    Each trial traces a trajectory of states (dots) linked by the actions taken (arrows); these samples are the data we fit the model $s_{t+1} = A s_t + B a_t$ to.
+</Figure>
 
 We can then use these to learn a linear model to predict $s_{t+1}$ as a function of $s_t$ and $a_t$:
 

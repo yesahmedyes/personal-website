@@ -6,6 +6,10 @@
 
 If we want to classify between cats and dogs, discriminative learning algorithms try to learn a hyperplane that separates the two classes directly. Generative learning algorithms, try to learn a model for what cats look like and a separate model to learn what dogs look like.
 
+<Figure src="/images/notes/gla-generative-vs-discriminative.png" alt="Two panels on the same two-class data: on the left a straight discriminative decision boundary splits the points; on the right generative Gaussian density contours are fitted to each class">
+    The discriminative model learns the boundary $p(y \mid x)$ directly (left), while the generative model fits a density $p(x \mid y)$ to each class and weights it by the prior $p(y)$ (right).
+</Figure>
+
 After modelling $p(x \mid y)$ for each class and the class prior $p(y)$, we can classify a new example by computing the posterior $p(y \mid x)$ for each class and picking the class with the highest posterior probability.
 
 $$

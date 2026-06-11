@@ -8,6 +8,10 @@ In the [K-means Algorithm](/notes/machine-learning/clustering), we made an inher
 
 Decision trees exploit this very assumption to build a tree structure that recursively divides the feature space into regions with similar labels.
 
+<Figure src="/images/notes/decision-trees-partition.png" alt="Decision tree beside the axis-aligned partition of the feature space its splits produce">
+    Each split is an axis-aligned cut; together they carve the feature space into rectangular leaves, and each leaf of the tree corresponds to one shaded region on the left.
+</Figure>
+
 For this purpose, we use the concept of purity. We want to split the data at each node such that the resulting subsets are as pure as possible.
 
 Two common impurity measures are Gini impurity and entropy.
@@ -43,6 +47,10 @@ H(S) = \frac{|S_L|}{|S|} \cdot H(S_L) + \frac{|S_R|}{|S|} \cdot H(S_R)
 $$
 
 Also, note that the worst case for our probabilities is if they follow a uniform distribution and $p_k = \frac{1}{c}$ for each $k$ because this would mean that each leaf is equally likely and our predictions are as good as random guessing.
+
+<Figure src="/images/notes/decision-trees-impurity.png" alt="Gini and entropy impurity as a function of class proportion, both peaking at one half">
+    Both Gini and entropy vanish for a pure node and are maximal at $p = \frac{1}{2}$, so a split is rewarded for pushing the class proportions toward $0$ or $1$.
+</Figure>
 
 If we let this distribution be $q$ then we see that minimizing the entropy is equivalent to maximizing the KL-divergence $D_{KL}(p || q)$.
 
@@ -308,6 +316,10 @@ $$
 ## AdaBoost
 
 AdaBoost is a boosting algorithm that is used for classification tasks.
+
+<Figure src="/images/notes/decision-trees-adaboost.png" alt="AdaBoost pipeline: dataset, weak learner, reweighted dataset, second weak learner, and the combined strong learner">
+    Each round fits a weak learner, then upweights the examples it misclassifies so the next learner focuses on them; the weighted combination of the weak learners forms the strong learner.
+</Figure>
 
 We assume that $y^{(i)} \in \{-1, 1\}$ and $h(x) \in \{-1, 1\}$.
 

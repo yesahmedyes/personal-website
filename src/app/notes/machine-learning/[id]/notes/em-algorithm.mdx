@@ -226,6 +226,10 @@ It can be shown that the EM algorithm converges to the maximum likelihood estima
 
 We saw that the for any given value of $\theta$ and any distribution over $z$, our log-likelihood $\ell(\theta) = \log p(x;\theta)$ is always greater than the $\text{ELBO}(x; Q, \theta)$.
 
+<Figure src="/images/notes/em-lower-bound.png" alt="The ELBO is tangent to the log-likelihood at theta-t; maximizing it reaches theta-(t+1), where the log-likelihood is higher still">
+    For fixed $Q^{(t)}$, the $\text{ELBO}$ touches $\ell$ at $\theta^{(t)}$ (A); the $M$-step maximizes it to $\theta^{(t+1)}$ (B), and since $\ell \geq \text{ELBO}$, $\ell(\theta^{(t+1)})$ (C) is higher still — so a step never decreases $\ell$.
+</Figure>
+
 Hence, 
 
 $$
@@ -253,6 +257,10 @@ $$
 $$
 
 Note that the reason we wanted a tight bound on our inequality was to guarantee convergence. Otherwise after the $E$ step, our $\text{ELBO}(x; Q^{(t)}, \theta^{(t)})$ could have been lower than our log-likelihood $\ell(\theta^{(t)})$. This would've meant that $\ell(\theta^{(t+1)})$ could have been lower than $\ell(\theta^{(t)})$.
+
+<Figure src="/images/notes/em-staircase.png" alt="Successive tangent lower bounds climbing the log-likelihood toward a local maximum, with shrinking steps">
+    Repeating the step, each fresh bound is tangent to $\ell$ at the current $\theta^{(k)}$ and is maximized to reach the next iterate; the iterates climb $\ell$ with shrinking steps, converging to a local maximum.
+</Figure>
 
 <Margin />
 
@@ -311,6 +319,10 @@ $$
 $$
 
 This shows us that $\text{ELBO}$ is maximized for a given value of $\theta$ when the KL divergence between $Q(z)$ and $p(z | x; \theta)$ is minimized, which is when they are equal. This is exactly what we saw while deriving the algorithm above.
+
+<Figure src="/images/notes/em-elbo-gap.png" alt="Log-likelihood split into the ELBO plus the KL gap; setting Q to the posterior closes the gap so the bound is tight">
+    At a fixed $\theta$, $\log p(x; \theta)$ splits into the $\text{ELBO}$ and the gap $D_{KL}(Q \parallel p_{z | x})$; the $E$ step sets $Q = p(z \mid x)$, closing the gap so the bound is tight.
+</Figure>
 
 <Derivation>
 $$

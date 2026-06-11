@@ -1,8 +1,6 @@
 await import("./src/env.js");
 
 import createMDX from "@next/mdx";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -11,8 +9,10 @@ const config = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
+    // Plugins are referenced by name (not imported function refs) so they are
+    // serializable across Turbopack's Rust/JS boundary. Works with webpack too.
+    remarkPlugins: [["remark-math"]],
+    rehypePlugins: [["rehype-katex"]],
   },
 });
 

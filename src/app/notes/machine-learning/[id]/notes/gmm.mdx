@@ -6,6 +6,10 @@ Suppose that we are given a training set $x^{(1)}, \ldots, x^{(n)}$ and we wish 
 
 Moreover, we assume that $x^{(i)} | z^{(i)} = j \sim \mathcal{N}(\mu_j, \Sigma_j)$. Gaussian mixture models are similar to the [K-means Algorithm](/notes/machine-learning/clustering) except that we allow for overlapping clusters and each cluster follows a Gaussian distribution.
 
+<Figure src="/images/notes/gmm-latent-structure.png" alt="Two panels over the same data: on the left only the unlabeled points are observed; on the right each point is colored by the latent z that chose one of two Gaussians, each drawn as covariance ellipses">
+    All we observe is the unlabeled cloud $x^{(i)}$ (left). The model explains it with a hidden $z^{(i)}$ that picks one of two Gaussians, each generating its points as $x \mid z{=}j \sim \mathcal{N}(\mu_j, \Sigma_j)$ (right). If we knew the $z^{(i)}$'s, fitting each Gaussian would be easy.
+</Figure>
+
 To maximize the log likelihood, we need to maximize:
 
 $$
@@ -27,6 +31,10 @@ p(z^{(i)} = j | x^{(i)}; \phi, \mu, \Sigma) = \frac{p(x^{(i)} | z^{(i)} = j; \mu
 $$
 
 When we plug in the equations for the gaussian distribution, this takes a form very similar to the softmax function. So in the $E$ step, we find our estimated probability distribution for what value $z^{(i)}$ should take for each $x^{(i)}$.
+
+<Figure src="/images/notes/gmm-responsibilities.png" alt="Top: two weighted Gaussian components and the mixture density they sum to. Bottom: the two posterior responsibilities as smooth curves crossing at one half, with sampled points sitting on them">
+    The mixture $p(x)$ is the sum of the weighted components $\phi_j\, p(x \mid z{=}j)$ (top). The $E$ step assigns each point *softly*: the responsibilities $w_j^{(i)} = p(z{=}j \mid x^{(i)})$ move smoothly between $0$ and $1$ and sum to one (bottom), unlike the hard assignment of k-means.
+</Figure>
 
 <Derivation>
 $$

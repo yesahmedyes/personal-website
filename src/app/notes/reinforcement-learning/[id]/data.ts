@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { lazy } from "react";
+import { type ComponentType, type LazyExoticComponent } from "react";
 
-const MDPMDX = lazy(() => import("./notes/mdp.mdx"));
+interface Note {
+  id: string;
+  title: string;
+  component: LazyExoticComponent<ComponentType>;
+}
 
-export const data = [
-  {
-    id: "mdp",
-    title: "Markov Decision Processes",
-    component: MDPMDX,
-  },
-];
+// Notes coming soon.
+export const data: Note[] = [];

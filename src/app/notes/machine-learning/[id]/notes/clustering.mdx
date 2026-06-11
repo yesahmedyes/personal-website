@@ -46,6 +46,10 @@ $$
 
 The first loop gives us the centroid $c^{(i)}$ that is closest to each data point $x^{(i)}$. The second loop updates the centroid $\mu_j$ for each cluster $j$ as the mean of all data points $x^{(i)}$ assigned to that cluster.
 
+<Figure src="/images/notes/clustering-kmeans-iterations.png" alt="Three panels showing one round of k-means: randomly placed initial centroids, points assigned to their nearest centroid with the resulting Voronoi regions, then each centroid moved to the mean of its assigned points">
+    One round on three clusters. From random centroids (left), each $x^{(i)}$ is assigned to its nearest centroid, carving the plane into Voronoi regions (middle); each $\mu_j$ then moves to its points' mean (right), alternating until assignments stop changing.
+</Figure>
+
 The distortion function (that measures the sum of the squared distances between each data point and its assigned centroid) can be written as:
 
 $$
@@ -53,3 +57,7 @@ J(c, \mu) = \sum_{i=1}^n \| x^{(i)} - \mu_{c^{(i)}} \|^2
 $$
 
 In each step of the k-means algorithm, $J$ either decreases or stays the same. Therefore, the algorithm is guaranteed to converge. However, the convergence is not guaranteed to reach a global minimum since $J$ is non-convex.
+
+<Figure src="/images/notes/clustering-local-minima.png" alt="The same dataset clustered two ways: a good initialization recovers the three clusters at low distortion, while a bad initialization splits one cluster between two centroids and merges the other two, giving a much higher distortion">
+    A lucky initialization recovers the three clusters ($J \approx 96$, left); an unlucky one splits one cluster and merges two others, a far worse optimum ($J \approx 659$, right). In practice we re-run and keep the lowest $J$.
+</Figure>

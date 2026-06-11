@@ -148,6 +148,10 @@ $$
 \arg \min_{\theta} \ell_{logistic}(t, y) = \arg \max_{\theta} \ell(\theta)
 $$
 
+<Figure src="/images/notes/classification-logistic-loss.png" alt="Logistic loss as a function of the score for each label">
+    Minimizing the logistic loss pushes the score $t = \theta^T x$ toward the correct sign: a confidently wrong prediction is penalized without bound, while a confidently correct one costs almost nothing.
+</Figure>
+
 <Derivation>
 $$
 \arg \min_{\theta} \ell_{logistic}(t, y)
@@ -193,6 +197,10 @@ For multi-class classification, if we have $k$ classes, we will have $k * \theta
 $$
 p(y = i \mid x ; \theta) =  \phi_i = \frac{exp\left(\theta_i^T x\right)}{\sum_{j=1}^{k} exp\left(\theta_j^T x\right)}
 $$
+
+<Figure src="/images/notes/classification-softmax-regions.png" alt="Softmax decision regions partitioning the feature space into k classes">
+    Softmax assigns each point to the class with the largest score $\theta_i^T x$, carving the feature space into $k$ regions whose boundaries lie where two classes tie.
+</Figure>
 
 Our cross-entropy loss (which is the negative log-likelihood) can then be written as:
 

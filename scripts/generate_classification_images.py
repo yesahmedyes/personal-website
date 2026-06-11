@@ -1,52 +1,17 @@
-import os
-
 import numpy as np
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from colors import PALETTE
-
-# Output directory (repo_root/public/images/notes), resolved relative to this file
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-OUT_DIR = os.path.join(REPO_ROOT, "public", "images", "notes")
-
-DPI = 200
-plt.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.size": 13,
-        "text.color": PALETTE["gray_dark"],
-        "axes.edgecolor": PALETTE["gray_point"],
-        "axes.labelcolor": PALETTE["gray_dark"],
-        "xtick.color": PALETTE["gray_dark"],
-        "ytick.color": PALETTE["gray_dark"],
-        "figure.facecolor": PALETTE["background"],
-        "axes.facecolor": PALETTE["background"],
-        "savefig.facecolor": PALETTE["background"],
-    }
+from style import (
+    setup, clean_axes, save,
+    INK, AXIS, BACKGROUND,
+    HUE, POINT, EDGE, REGION,
+    FONT, LW, MARK,
 )
 
-
-def _clean_axes(ax):
-    """Light, minimal axes that match the existing note figures."""
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-    for spine in ("left", "bottom"):
-        ax.spines[spine].set_color(PALETTE["gray_point"])
-    ax.tick_params(length=0)
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-
-def save(fig, name):
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, name)
-    fig.savefig(path, dpi=DPI, bbox_inches="tight", pad_inches=0.25)
-    plt.close(fig)
-    print(f"wrote {path}")
+setup()
 
 
 # ---------------------------------------------------------------------------
@@ -57,24 +22,24 @@ def figure_sigmoid():
     g = 1.0 / (1.0 + np.exp(-z))
 
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
-    _clean_axes(ax)
+    clean_axes(ax)
 
     # Asymptotes at 0 and 1
     for level in (0.0, 1.0):
         ax.axhline(
             level,
-            color=PALETTE["gray_point"],
+            color=AXIS,
             linestyle=(0, (4, 3)),
-            linewidth=1.1,
+            linewidth=LW.guide,
             zorder=1,
         )
 
     # Vertical reference at z = 0
     ax.axvline(
         0,
-        color=PALETTE["gray_point"],
+        color=AXIS,
         linestyle=(0, (4, 3)),
-        linewidth=1.1,
+        linewidth=LW.guide,
         zorder=1,
     )
 
@@ -82,8 +47,8 @@ def figure_sigmoid():
     ax.plot(
         z,
         g,
-        color=PALETTE["coral_dark"],
-        linewidth=2.6,
+        color=EDGE.coral,
+        linewidth=LW.line,
         zorder=3,
         label=r"$g(z) = \dfrac{1}{1 + e^{-z}}$",
     )
@@ -92,23 +57,23 @@ def figure_sigmoid():
     ax.scatter(
         [0],
         [0.5],
-        s=70,
-        facecolor=PALETTE["blue_point"],
-        edgecolor=PALETTE["blue_dark"],
-        linewidth=1.4,
+        s=MARK.large,
+        facecolor=POINT.blue,
+        edgecolor=EDGE.blue,
+        linewidth=LW.edge,
         zorder=4,
     )
     ax.annotate(
         r"$g(0) = \frac{1}{2}$",
         xy=(0, 0.5),
         xytext=(1.4, 0.36),
-        fontsize=12,
-        color=PALETTE["gray_dark"],
-        arrowprops=dict(arrowstyle="-", color=PALETTE["gray_point"], linewidth=1.0),
+        fontsize=FONT.annotation,
+        color=INK,
+        arrowprops=dict(arrowstyle="-", color=AXIS, linewidth=LW.guide),
     )
 
-    ax.text(-7.7, 0.04, r"$0$", fontsize=12, color=PALETTE["gray_dark"], va="center")
-    ax.text(-7.7, 0.96, r"$1$", fontsize=12, color=PALETTE["gray_dark"], va="center")
+    ax.text(-7.7, 0.04, r"$0$", fontsize=FONT.annotation, color=INK, va="center")
+    ax.text(-7.7, 0.96, r"$1$", fontsize=FONT.annotation, color=INK, va="center")
 
     ax.set_xlabel(r"$z = 0$")
     ax.set_ylabel(r"$h_\theta(x)$")
@@ -117,7 +82,7 @@ def figure_sigmoid():
         frameon=False,
         loc="lower right",
         bbox_to_anchor=(1.0, 0.05),
-        fontsize=13,
+        fontsize=FONT.title,
         handlelength=1.6,
         borderaxespad=0.6,
     )
@@ -136,7 +101,7 @@ def figure_decision_boundary():
     c1 = rng.normal(loc=[1.6, 1.5], scale=[1.0, 1.0], size=(n, 2))
 
     fig, ax = plt.subplots(figsize=(6.4, 5.0))
-    _clean_axes(ax)
+    clean_axes(ax)
 
     lim = 5.0
     ax.set_xlim(-lim, lim)
@@ -158,8 +123,7 @@ def figure_decision_boundary():
         gy,
         score,
         levels=[0, score.max()],
-        colors=[PALETTE["light_coral"]],
-        alpha=0.55,
+        colors=[REGION.coral],
         zorder=0,
     )
     ax.contourf(
@@ -167,8 +131,7 @@ def figure_decision_boundary():
         gy,
         score,
         levels=[score.min(), 0],
-        colors=[PALETTE["light_blue"]],
-        alpha=0.55,
+        colors=[REGION.blue],
         zorder=0,
     )
 
@@ -178,8 +141,8 @@ def figure_decision_boundary():
     ax.plot(
         xs,
         ys,
-        color=PALETTE["gray_dark"],
-        linewidth=2.0,
+        color=INK,
+        linewidth=LW.line,
         zorder=2,
     )
 
@@ -187,20 +150,20 @@ def figure_decision_boundary():
     ax.scatter(
         c0[:, 0],
         c0[:, 1],
-        s=68,
-        facecolor=PALETTE["blue_point"],
-        edgecolor=PALETTE["blue_dark"],
-        linewidth=1.4,
+        s=MARK.point,
+        facecolor=POINT.blue,
+        edgecolor=EDGE.blue,
+        linewidth=LW.edge,
         zorder=3,
         label=r"$y^{(i)} = 0$",
     )
     ax.scatter(
         c1[:, 0],
         c1[:, 1],
-        s=68,
-        facecolor=PALETTE["coral_point"],
-        edgecolor=PALETTE["coral_dark"],
-        linewidth=1.4,
+        s=MARK.point,
+        facecolor=POINT.coral,
+        edgecolor=EDGE.coral,
+        linewidth=LW.edge,
         zorder=3,
         label=r"$y^{(i)} = 1$",
     )
@@ -210,16 +173,16 @@ def figure_decision_boundary():
         2.7,
         3.9,
         r"$h_\theta(x) > \frac{1}{2}$",
-        fontsize=12,
-        color=PALETTE["coral_dark"],
+        fontsize=FONT.annotation,
+        color=EDGE.coral,
         ha="center",
     )
     ax.text(
         -3.0,
         -3.9,
         r"$h_\theta(x) < \frac{1}{2}$",
-        fontsize=12,
-        color=PALETTE["blue_dark"],
+        fontsize=FONT.annotation,
+        color=EDGE.blue,
         ha="center",
     )
 
@@ -229,8 +192,8 @@ def figure_decision_boundary():
         xs[70] + 0.45,
         ys[70] + 0.55,
         r"$\theta^T x = 0$",
-        fontsize=12,
-        color=PALETTE["gray_dark"],
+        fontsize=FONT.annotation,
+        color=INK,
         ha="center",
         va="center",
         rotation=boundary_angle,
@@ -244,21 +207,240 @@ def figure_decision_boundary():
     ax.set_aspect("equal")
     legend = ax.legend(
         loc="upper left",
-        fontsize=12,
+        fontsize=FONT.annotation,
         handlelength=1.0,
         borderaxespad=0.6,
         framealpha=1.0,
     )
-    legend.get_frame().set_facecolor(PALETTE["background"])
+    legend.get_frame().set_facecolor(BACKGROUND)
     legend.get_frame().set_edgecolor("none")
     legend.get_frame().set_alpha(1.0)
     legend.set_zorder(5)
     save(fig, "classification-decision-boundary.png")
 
 
+# ---------------------------------------------------------------------------
+# 3. Multiclass softmax decision regions
+# ---------------------------------------------------------------------------
+def figure_softmax_regions():
+    """Three-class softmax partition: predicted class = argmax_i theta_i^T x."""
+    rng = np.random.default_rng(7)
+    n = 16
+    lim = 5.0
+
+    # Three class "directions" 120 degrees apart give a symmetric partition.
+    # Each class score is theta_i^T x; the prediction is argmax_i theta_i^T x.
+    centre_angles = np.array([90.0, 210.0, 330.0])  # cluster centres (degrees)
+    centres = 2.6 * np.column_stack(
+        [np.cos(np.radians(centre_angles)), np.sin(np.radians(centre_angles))]
+    )
+    thetas = centres  # theta_i points toward cluster i
+
+    fig, ax = plt.subplots(figsize=(6.4, 5.0))
+    clean_axes(ax)
+    ax.set_xlim(-lim, lim)
+    ax.set_ylim(-lim, lim)
+
+    # Predicted class over a grid = argmax of the linear scores
+    gx, gy = np.meshgrid(
+        np.linspace(-lim, lim, 500),
+        np.linspace(-lim, lim, 500),
+    )
+    scores = np.stack([thetas[i, 0] * gx + thetas[i, 1] * gy for i in range(3)])
+    cls = np.argmax(scores, axis=0).astype(float)
+
+    region_colors = [
+        REGION.blue,
+        REGION.coral,
+        REGION.sage,
+    ]
+    ax.contourf(
+        gx,
+        gy,
+        cls,
+        levels=[-0.5, 0.5, 1.5, 2.5],
+        colors=region_colors,
+        zorder=0,
+    )
+
+    # Decision boundaries: rays from the origin where two scores tie,
+    # bisecting adjacent cluster directions (at 30, 150, 270 degrees).
+    # Extend past the axes so each ray is clipped flush to the plot edge.
+    ray = 2 * lim
+    for a in (30.0, 150.0, 270.0):
+        ax.plot(
+            [0, ray * np.cos(np.radians(a))],
+            [0, ray * np.sin(np.radians(a))],
+            color=INK,
+            linewidth=LW.line,
+            zorder=2,
+        )
+
+    point_fill = [
+        POINT.blue,
+        POINT.coral,
+        POINT.green,
+    ]
+    point_edge = [
+        EDGE.blue,
+        EDGE.coral,
+        EDGE.green,
+    ]
+    for i in range(3):
+        pts = rng.normal(loc=centres[i], scale=0.62, size=(n, 2))
+        ax.scatter(
+            pts[:, 0],
+            pts[:, 1],
+            s=MARK.point,
+            facecolor=point_fill[i],
+            edgecolor=point_edge[i],
+            linewidth=LW.edge,
+            zorder=3,
+            label=rf"$y^{{(i)}} = {i + 1}$",
+        )
+
+    # Label a boundary with the "two classes tie" condition
+    ax.text(
+        0.3,
+        -4.0,
+        r"$\theta_i^T x = \theta_j^T x$",
+        fontsize=FONT.annotation,
+        color=INK,
+        ha="left",
+        va="center",
+    )
+
+    ax.set_xlabel(r"$x_1$")
+    ax.set_ylabel(r"$x_2$")
+    ax.set_aspect("equal")
+    legend = ax.legend(
+        loc="upper right",
+        fontsize=FONT.annotation,
+        handlelength=1.0,
+        borderaxespad=0.6,
+        facecolor=BACKGROUND,
+        edgecolor="none",
+        framealpha=1.0,
+    )
+    legend.set_zorder(5)
+    save(fig, "classification-softmax-regions.png")
+
+
+# ---------------------------------------------------------------------------
+# 4. Logistic (cross-entropy) loss vs. the score t = theta^T x
+# ---------------------------------------------------------------------------
+def figure_logistic_loss():
+    """How the per-example logistic loss penalises the score for each label."""
+    t = np.linspace(-6, 6, 400)
+    loss_y1 = np.log1p(np.exp(-t))  # y = 1 : -log h_theta(x)
+    loss_y0 = np.log1p(np.exp(t))  # y = 0 : -log(1 - h_theta(x))
+
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    clean_axes(ax)
+
+    # The loss floor (both curves approach 0) and the t = 0 reference
+    ax.axhline(
+        0.0,
+        color=AXIS,
+        linestyle=(0, (4, 3)),
+        linewidth=LW.guide,
+        zorder=1,
+    )
+    ax.axvline(
+        0.0,
+        color=AXIS,
+        linestyle=(0, (4, 3)),
+        linewidth=LW.guide,
+        zorder=1,
+    )
+
+    ax.plot(
+        t,
+        loss_y1,
+        color=EDGE.coral,
+        linewidth=LW.line,
+        zorder=3,
+        label=r"$y = 1$",
+    )
+    ax.plot(
+        t,
+        loss_y0,
+        color=EDGE.blue,
+        linewidth=LW.line,
+        zorder=3,
+        label=r"$y = 0$",
+    )
+
+    # Intuition: confidently wrong is punished hard, confidently right costs ~0
+    ax.text(
+        -4.8,
+        5.3,
+        "confidently\nwrong",
+        fontsize=FONT.tick,
+        color=INK,
+        ha="left",
+        va="center",
+        ma="center",
+    )
+    ax.text(
+        3.3,
+        0.6,
+        "confidently\nright",
+        fontsize=FONT.tick,
+        color=INK,
+        ha="left",
+        va="center",
+        ma="center",
+    )
+    # Mirror labels on the y = 0 (blue) curve: low loss (right) on the left,
+    # high loss (wrong) on the right
+    ax.text(
+        -3.3,
+        0.6,
+        "confidently\nright",
+        fontsize=FONT.tick,
+        color=INK,
+        ha="right",
+        va="center",
+        ma="center",
+    )
+    ax.text(
+        4.8,
+        5.3,
+        "confidently\nwrong",
+        fontsize=FONT.tick,
+        color=INK,
+        ha="right",
+        va="center",
+        ma="center",
+    )
+
+    ax.set_xlabel(r"$t = 0$")
+    ax.set_ylabel(r"$\ell_{\mathrm{logistic}}(t, y)$")
+    ax.set_xlim(-6, 6)
+    ax.set_ylim(-0.3, 6.2)
+    legend = ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.0),
+        fontsize=FONT.annotation,
+        handlelength=1.6,
+        borderaxespad=0.6,
+        borderpad=0.8,
+        framealpha=1.0,
+    )
+    legend.get_frame().set_facecolor(BACKGROUND)
+    legend.get_frame().set_edgecolor(AXIS)
+    legend.get_frame().set_linewidth(0.8)
+    legend.get_frame().set_alpha(1.0)
+    legend.set_zorder(5)
+    save(fig, "classification-logistic-loss.png")
+
+
 def main():
     figure_sigmoid()
     figure_decision_boundary()
+    figure_softmax_regions()
+    figure_logistic_loss()
 
 
 if __name__ == "__main__":

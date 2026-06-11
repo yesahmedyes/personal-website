@@ -18,6 +18,10 @@ $$
 
 To select the principal component of $x$, we need to find the unit vector $u$ that maximizes the variance of the data when projected onto $u$. The greater the projection of $x$ onto $u$, the higher the variance, meaning more information is captured in that direction.
 
+<Figure src="/images/notes/pca-variance-direction.png" alt="The same data projected onto a high-variance direction versus a low-variance direction">
+    PCA seeks the direction $u$ whose projected points (red) are most spread out — high variance (left) rather than low (right).
+</Figure>
+
 $$
 u = \arg \max_u \frac{1}{n} \sum_{i=1}^{n} \left\| proj_u ( x^{(i)}) \right\|_2^2
 $$
@@ -25,6 +29,10 @@ $$
 $$
 = \arg \max_u \left[ u^T \, \Sigma \, u \right] \text{ where } \Sigma = \frac{1}{n} \sum_{i=1}^{n} x^{(i)}x^{(i) T}
 $$
+
+<Figure src="/images/notes/pca-projection.png" alt="Orthogonal projection of a point x onto the unit vector u">
+    The projection of $x$ onto $u$, written $proj_u(x)$, is the foot of the perpendicular dropped from $x$ onto the line spanned by $u$.
+</Figure>
 
 <Derivation>
 <Lemma>
@@ -155,5 +163,9 @@ $$
 </Derivation>
 
 Therefore, to maximize the variance, we need to choose the eigenvector with the largest eigenvalue.
+
+<Figure src="/images/notes/pca-principal-components.png" alt="Data cloud with the two principal component directions drawn as arrows from the center">
+    The principal components are the eigenvectors of $\Sigma$: $u_1$ lies along the direction of greatest variance (largest eigenvalue), with $u_2$ orthogonal to it.
+</Figure>
 
 In practice, we decompose $\Sigma$ into its eigenvalues and eigenvectors using singular value decomposition and then choose the top $k$ eigenvectors with the largest eigenvalues.

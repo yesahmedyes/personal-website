@@ -41,6 +41,10 @@ $$
 Q_i(z^{(i)}) = \mathcal{N}\left(q(x^{(i)}; \phi), \, \text{diag}(v(x^{(i)}; \psi))^2 \right)
 $$
 
+<Figure src="/images/notes/vae-architecture.png" alt="An encoder maps x to a mean and variance, a latent z is sampled from them, and a decoder maps z back to a reconstruction">
+    The encoder turns $x$ into the parameters of $Q$ — a mean $q(x; \phi)$ and a variance $v(x; \psi)$; we sample a latent $z \sim Q$ and the decoder $g(z; \theta)$ maps it back to a reconstruction $\hat{x}$.
+</Figure>
+
 We use this $Q_i(z^{(i)})$ to find our $\text{ELBO}$ for the $M$ step.
 
 $$
@@ -78,6 +82,10 @@ $$
 $$
 
 where $\hat{z}^{(i)}$ is just the reparameterized version of $z^{(i)}$ and $\hat{z}^{(i)} = q(x^{(i)}; \, \phi) + v(x^{(i)}; \, \psi) \odot \xi^{(i)}$
+
+<Figure src="/images/notes/vae-reparameterization.png" alt="A standard normal distribution shifted and scaled by mu and sigma into the latent distribution">
+    Sampling $z \sim \mathcal{N}(\mu, \sigma^2)$ is equivalent to drawing $\xi \sim \mathcal{N}(0, 1)$ and mapping $z = \mu + \sigma \odot \xi$. Randomness lives in $\xi$, so gradients flow through $\mu$ and $\sigma$ back to $\phi$ and $\psi$.
+</Figure>
 
 We can find all three derivatives by backpropagating through their respective neural networks.
 

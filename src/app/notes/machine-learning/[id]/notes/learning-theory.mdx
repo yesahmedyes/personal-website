@@ -32,6 +32,10 @@ The bias is the error introduced by the "expressivity handicap" of our classifie
 
 The variance is the error that measures how much the model's predictions would change if it were trained on a different dataset.
 
+<Figure src="/images/notes/learning-theory-bullseye.png" alt="Bias-variance bullseye: four targets showing low and high bias against low and high variance">
+    Each shot is a model fit on a different dataset: bias is how far the cluster sits from the bullseye $h^*$, while variance is how spread out the shots are.
+</Figure>
+
 <Derivation>
 <Lemma>
 For two independent events A and B such that $\mathbb{E}[A] = 0$
@@ -138,7 +142,15 @@ $$
 
 The Bias-Variance tradeoff tells us that as we increase the number of parameters in our neural network, the test error will decrease because the bias is decreasing. However, after a certain point the variance starts increasing faster than the bias is decreasing and therefore, the test error will start to increase.
 
+<Figure src="/images/notes/learning-theory-bias-variance.png" alt="Bias-variance tradeoff: bias squared falling and variance rising, summing to a U-shaped total error">
+    As model complexity grows, $\text{bias}^2$ falls and variance rises; their sum — the total error — is minimized at the intermediate optimum where the two curves cross.
+</Figure>
+
 In reality, however, we see a double descent phenomenon wherein the test error starts to decrease again at the point where the number of parameters $d$ are approximately equal to the number of training examples $n$. This is called the over-parameterization regime.
+
+<Figure src="/images/notes/learning-theory-double-descent.png" alt="Double descent curve: test error peaks at the interpolation threshold then descends again">
+    Past the interpolation threshold $d \approx n$, the test error falls a second time, dropping below the classical minimum in the over-parameterized regime.
+</Figure>
 
 <Margin />
 

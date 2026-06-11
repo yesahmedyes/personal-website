@@ -16,6 +16,10 @@ $$
 \theta \leftarrow \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - \theta^T \phi(x^{(i)})\right)\phi(x^{(i)})
 $$
 
+<Figure src="/images/notes/kernel-methods-feature-map.png" alt="Feature map turning a circular decision boundary in input space into a straight line in feature space">
+    Data that needs a circular boundary in input space becomes linearly separable under the feature map $\phi$: the boundary $x_1^2 + x_2^2 = c$ turns into a straight line in the feature space spanned by $x_1^2$ and $x_2^2$.
+</Figure>
+
 However, this can become computationally expensive if the feature mapping is too complex. For example, if $\phi(x)$ is a vector that contains all the monomials of $x$ with degree $\leq 3$, then the dimension of our features is $d^3$ where $d$ is the dimension of $x$.
 
 This would mean that $\theta$ would also have $d^3$ parameters and we will need to compute $d^3$ gradient updates.

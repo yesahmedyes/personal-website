@@ -7,13 +7,13 @@ export default function Main() {
   return (
     <div className="flex w-full flex-col">
       <div className="bg-bgDark w-full py-32">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-10 justify-center place-items-center max-w-4xl mx-auto pb-4">
-          <div className="aspect-square cursor-pointer rounded-2xl bg-[#E2D6CD] bg-[url('/images/me.png')] bg-[length:80%] bg-[left_1rem_top_2rem] bg-no-repeat w-2/3 lg:w-1/3"></div>
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-10 justify-center place-items-center max-w-5xl mx-auto pb-4">
+          <div className="aspect-square cursor-pointer rounded-2xl bg-[#ffe9d8] bg-[url('/images/me.png')] bg-[length:75%] bg-[left_1.5rem_top_1rem] bg-no-repeat w-2/3 sm:w-1/3 lg:w-1/4"></div>
 
           <div className="flex flex-col gap-5 lg:gap-4 text-textWhite text-lg px-6 lg:px-0 w-full lg:w-2/3">
             <p className="font-serif font-medium text-xl lg:text-2xl text-center lg:text-left">Hey, I&apos;m Ahmed.</p>
             <p className="font-sans font-light leading-relaxed text-center lg:text-justify pb-0 lg:pb-2">
-              A machine learning researcher with an interest in 3D Computer Vision, Vision-Language Models, and Reinforcement Learning.
+              A machine learning engineer and researcher with an interest in 3D Computer Vision, Vision-Language Models, and Reinforcement Learning.
             </p>
           </div>
         </div>
